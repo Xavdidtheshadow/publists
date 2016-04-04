@@ -1,0 +1,30 @@
+{
+  "name": "publists",
+  "version": "1.0.0",
+  "description": "Public lists for wunderlists. Hopefully as a service at some point.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xavdidtheshadow/publists.git"
+  },
+  "keywords": [
+    "wunderlist"
+  ],
+  "author": "David Brownman <beamneocube@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Xavdidtheshadow/publists/issues"
+  },
+  "homepage": "https://github.com/Xavdidtheshadow/publists#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "jade": "^1.11.0",
+    "request-promise": "^2.0.1"
+  },
+  "devDependencies": {
+    "dotenv": "^2.0.0"
+  }
+}
