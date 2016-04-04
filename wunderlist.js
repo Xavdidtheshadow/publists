@@ -1,6 +1,7 @@
 'use strict';
 
 const request = require('request-promise');
+const base_url = 'https://a.wunderlist.com/api/v1';
 
 let options = {
   transform: function(body) {
@@ -12,12 +13,19 @@ let options = {
   }
 };
 
-function url(lid) {
-  return `https://a.wunderlist.com/api/v1/tasks?list_id=${lid}`;
+function tasks_url(lid) {
+  return `${base_url}/tasks?list_id=${lid}`;
+}
+
+function lists_url() {
+  return `${base_url}/lists`;
 }
 
 module.exports = {
-  fetch_tasks_by_list_id: function(lid) {
-    return request.get(url(lid), options);
+  fetch_tasks_by_list_id: lid => {
+    return request.get(tasks_url(lid), options);
+  },
+  fetch_lists: () => {
+    return request.get(lists_url(), options);
   }
 };
