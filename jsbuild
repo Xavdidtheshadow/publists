@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# triggers watchify locally and will also be the build script in production
+
+if [ "$NODE_ENV" = "production" ];then
+    COMMAND="browserify -g uglifyify"
+else
+    COMMAND="watchify"
+fi
+
+eval "$COMMAND client.js -o public/_bundle.js -v"
