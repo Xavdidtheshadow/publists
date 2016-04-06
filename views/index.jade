@@ -1,14 +1,26 @@
 extends ./layout.jade
 
 block content
-  p
-    | These are your lists. Check the ones you'd like to make public! 
-    
-  ul(style="list-style-type: none")
-    li(ng-repeat="list in lists")
-      input(type="checkbox" ng-model="model[list.id]")
-      span
-        | 
-      a(href="/lists/{{list.id}}/tasks")
-        | {{list.title}}
-        
+  if user
+    if user.wunderlistToken
+      p.
+        These are your lists. Check the ones you'd like to make public!
+
+      ul(style="list-style-type: none")
+        li(ng-repeat="list in lists")
+          input(type="checkbox" ng-model="model[list.id]")
+          span
+            | 
+          a(href="/lists/{{list.id}}/tasks")
+            | {{list.title}}
+    else
+      p.
+        Looks like we don't have access to your Wunderlist account!
+
+      include ./_wunderlist
+
+  else
+    p
+      a(href="/login").
+        Login 
+      | to get started!

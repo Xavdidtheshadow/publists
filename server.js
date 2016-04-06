@@ -4,6 +4,7 @@ const favicon = require('serve-favicon');
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const sassMiddleware = require('node-sass-middleware');
 
 const app = express();
 app.use(require('helmet')());
@@ -20,6 +21,12 @@ if (app.get('production')) {
 
 // set up parse db
 require('./db_config')(app);
+app.use(sassMiddleware({
+  src: __dirname + '/views',
+  prefix: '/public',
+  // never actually write the file
+  response: true
+}));
 
 let Parse = require('parse/node');
 Parse.initialize(process.env.APP_ID);
@@ -43,7 +50,13 @@ const wunderlist = require('./wunderlist');
 
 // CUSTOM MIDDLWARE
 function sessionPasser(req, res, next) {
-  res.locals.session = req.session.user;
+  if (req.session.user) {
+    res.locals.user = {
+      username: req.session.user.username,
+      publicLists: req.session.user.publicLists,
+      objectId: req.session.user.objectId
+    };
+  }
   next();
 }
 

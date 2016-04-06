@@ -1,0 +1,21 @@
+body {
+  background-image: url('bg.png');
+}
+
+h1 {
+  color: blue;
+}
+
+h2 {
+  color: green;
+}
+
+.formbox {
+  max-width: 25%;
+  form {
+    border: 1px solid grey;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #fff;
+  }
+}

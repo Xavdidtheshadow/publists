@@ -1,16 +1,17 @@
 extends ./layout.jade
 
 block content
-  form(action="register" method="post")
-    .form-group
-      label(for="username")
-        | Username
-      input.form-control#username(name="username" type="text")
+  .formbox
+    form(action="register" method="post")
+      .form-group
+        label(for="username")
+          | Username
+        input.form-control#username(name="username" type="text")
 
-    .form-group
-      label(for="password")
-        | Password
-      input.form-control#password(name="password" type="password")
+      .form-group
+        label(for="password")
+          | Password
+        input.form-control#password(name="password" type="password")
 
-    button.btn.btn-default(type="submit")
-      | Submit
+      button.btn.btn-default(type="submit")
+        | Submit
