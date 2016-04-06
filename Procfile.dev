@@ -1,3 +1,4 @@
-# 
+# start processes
 web: PORT=1337 nodemon --ignore client.js --ignore public/_bundle.js
 client: ./jsbuild
+mongo: mongod

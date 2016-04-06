@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    title Publists
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
+
+  body(ng-app="publists")
+    #{JSON.stringify(session)} 
+    .container(ng-controller="MainController")
+      h1 Publists 
+        small 
+          | Public Wunderlists 
+          = session.username ? `> ${session.username}` : ''
+
+      block content
+        p the content goes here
+
+    script(src="/public/_bundle.js")
