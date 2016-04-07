@@ -1,21 +1,73 @@
+@import 'media';
+
+$blue: #00274c;
+$maize: #ffcb05;
+$grey: #eff0f1;
+$dark_grey: #e5e5e5;
+$white: #fff;
+$dark_blue: #333333;
+
+$footer_height: 40px;
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 body {
-  background-image: url('bg.png');
-}
+  margin-bottom: $footer_height;
 
-h1 {
-  color: blue;
-}
+  background-image: url('bg2.png');
+  background-color: $blue;
 
-h2 {
-  color: green;
-}
+  color: $grey;
 
-.formbox {
-  max-width: 25%;
-  form {
-    border: 1px solid grey;
-    border-radius: 5px;
-    padding: 20px;
-    background-color: #fff;
+  a {
+    color: $maize;
+    &:hover {
+      color: $maize;
+    }
+    &:visited {
+      color: $maize;
+    }
   }
-}
+
+  .mid {
+    h1 {
+      small {
+        color: $grey;
+      }
+    }
+
+    .formbox {
+      align: center;
+      color: $dark_blue;
+
+      @include tablet {
+        width: 30%;
+      }
+
+      form {
+        border: 1px solid $grey;
+        border-radius: 5px;
+        padding: 20px;
+        background-color: $white;
+      }
+    } 
+  } // end of mid
+
+  .bot {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px dashed $maize;
+    height: $footer_height;
+
+    // background-color: $blue;
+
+    p {
+      margin: 10px 0;
+    }
+  } // end of bot
+
+} // end of body

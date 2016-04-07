@@ -1,20 +1,30 @@
 doctype html
 html(lang="en")
   head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+
     title Publists
+
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
     link(rel='stylesheet' href='/public/the.css')
 
   body(ng-app="publists")
-    #{JSON.stringify(user)} 
-    .container(ng-controller="MainController")
-      h1 Publists 
-        small
-          | Public Wunderlists 
-          if user
-            = `> ${user.username}`
+    //- .top.container-fluid.
+      I'm a header
+    .mid.container(ng-controller="MainController")
+      h1
+        | Publists 
+        
+        if user
+          = `> ${user.username}`
 
       block content
         p the content goes here
+
+    footer.bot.container-fluid
+      p.
+        I'm at the bottom!
 
     script(src="/public/_bundle.js")
