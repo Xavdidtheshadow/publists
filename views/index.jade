@@ -2,26 +2,29 @@ extends ./layout.jade
 
 block content
   if user
-    if user.wunderlistToken
+    //- if user.wunderlistToken
+    .content(ng-controller="MainController")
       p.
         These are your lists. Check the ones you'd like to make public!
 
-      ul(style="list-style-type: none")
-        li(ng-repeat="list in lists")
+      ul
+        li(ng-repeat="list in lists" ng-click="toggle(list)")
+          .row
           input(type="checkbox" ng-model="model[list.id]")
-          span
-            | 
-          a(href="/lists/{{list.id}}/tasks")
-            | {{list.title}}
-    else
-      p.
-        Looks like we don't have access to your Wunderlist account!
+          //- a(href="/lists/{{list.id}}/tasks")
+          | {{list.title}}
 
-      include ./_wunderlist
+      .btn.btn-default(ng-click="save()").
+        Save
+    //- else
+    //-   p.
+    //-     Looks like we don't have access to your Wunderlist account!
+
+    //-   include ./_wunderlist
 
   else
     p
-      a(href="/login").
+      a(href="/register").
         Login
       |  
       | to get started!

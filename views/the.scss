@@ -22,6 +22,16 @@ body {
 
   color: $grey;
 
+  .btn {
+    color: $dark_blue;
+    &:hover {
+      color: $dark_blue;
+    }
+    &:visited {
+      color: $dark_blue;
+    }
+  }
+
   a {
     color: $maize;
     &:hover {
@@ -33,11 +43,11 @@ body {
   }
 
   .mid {
-    h1 {
-      small {
-        color: $grey;
-      }
-    }
+    // h1 {
+      // small {
+      //   color: $grey;
+      // }
+    // }
 
     .formbox {
       align: center;
@@ -54,6 +64,24 @@ body {
         background-color: $white;
       }
     } 
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+
+      li {
+        color: $dark_blue;
+        padding: 10px;
+        margin: 2px;
+        background-color: $grey;
+        border-radius: 5px;
+        cursor: pointer;
+
+        input {
+          margin-right: 10px;
+        }
+      }
+    }
   } // end of mid
 
   .bot {
@@ -63,6 +91,7 @@ body {
     border-top: 1px dashed $maize;
     height: $footer_height;
 
+    // remove texture in fotter with this
     // background-color: $blue;
 
     p {

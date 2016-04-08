@@ -13,18 +13,23 @@ html(lang="en")
   body(ng-app="publists")
     //- .top.container-fluid.
       I'm a header
-    .mid.container(ng-controller="MainController")
+    .mid.container
       h1
         | Publists 
         
         if user
-          = `> ${user.username}`
+          small
+            = user.username
 
       block content
         p the content goes here
 
     footer.bot.container-fluid
-      p.
-        I'm at the bottom!
+      p
+        | This site was made by 
+        a(href="http://davidbrownman.com").
+          David Brownman
+        |  
+        | and is not affiliated with Wunderlist in any way.
 
     script(src="/public/_bundle.js")

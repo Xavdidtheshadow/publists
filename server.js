@@ -29,7 +29,7 @@ app.use(sassMiddleware({
 }));
 
 let Parse = require('parse/node');
-Parse.initialize(process.env.APP_ID);
+Parse.initialize(process.env.APP_ID, null, process.env.MASTER_KEY);
 Parse.serverURL = app.get('server_url');
 
 app.set('port', (process.env.PORT));
@@ -50,7 +50,9 @@ const wunderlist = require('./wunderlist');
 
 // CUSTOM MIDDLWARE
 function sessionPasser(req, res, next) {
+  console.log(Parse.User.current());
   if (req.session.user) {
+    console.log(req.session.user);
     res.locals.user = {
       username: req.session.user.username,
       publicLists: req.session.user.publicLists,
@@ -79,8 +81,10 @@ app.post('/register', (req, res) => {
 
   user.signUp(null, {
     success: function(user) {
+      // apparently parse stores info in localstorage too? 
       req.session.user = user;
-      res.redirect('/wunderlistAuth');
+      // res.redirect('/wunderlistAuth');
+      res.redirect('/');
     },
     error: function(user, error) {
       res.send({status: error.code, message: error.message});
@@ -103,13 +107,39 @@ app.get('/wunderlistAuth', (req, res) => {
   res.render('wunderlistButton');
 });
 
+app.post('/update', (req, res) => {
+  if (!req.session.user) {
+    res.status(401).send({message: "No session exists"});
+  } else {
+    let q = new Parse.Query(Parse.User).equalTo("objectId", req.session.user.objectId);
+    q.first().then(u => {
+      console.log('fetched user', u);
+      u.save({publicLists: req.body.lists}, {useMasterKey: true}).then(newU => {
+        req.session.user = newU;
+        console.log('saved!', req.body.lists);
+        res.sendStatus(200);
+      }, (err) => {
+        console.log('err', err);
+        res.status(err.code).send({status: err.code, message: err.message});
+      });
+    }, err => {
+      console.log('err bottom');
+      res.status(403).send({message: "Invalid userID"});
+    });
+  }
+});
+
 app.get('/lists', (req, res) => {
+  // res.render('lists');
+});
+
+app.get('/api/lists', (req, res) => {
   wunderlist.fetch_lists().then(lists => {
     res.send(lists);
   });
 });
 
-app.get('/lists/:lid/tasks' ,(req, res) => {
+app.get('/api/lists/:lid/tasks' ,(req, res) => {
   wunderlist.fetch_tasks_by_list_id(req.params.lid).then(tasks => {
     res.send(tasks);
   });
