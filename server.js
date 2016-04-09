@@ -136,6 +136,30 @@ app.get('/lists', (req, res) => {
   // res.render('lists');
 });
 
+app.get('/user/:uid/lists/:lid', (req, res, next) => {
+  console.log('top of function!');
+  let q = new Parse.Query(Parse.User).equalTo("objectId", req.params.uid);
+  q.first().then(u => {
+    console.log('found user');
+    let lists = u.get('publicLists');
+    // console.log(u.publicLists[req.params.lid]);
+    if (lists[req.params.lid]) {
+      wunderlist.fetch_tasks_by_list_id(req.params.lid, process.env.WUNDERLIST_ACCESS_TOKEN).then(tasks => {
+        res.render('list', {tasks: tasks});
+      }).catch(err => {
+        console.log('wunderlist error');
+        res.status(500).send({error: err.message});
+      });
+    } else {
+      console.log('list not found or not public');
+      res.status(404).send('not found');
+    }
+  }, err => {
+    console.log('bot error');
+    res.status(500).send({error: err.message});
+  });
+});
+
 app.get('/api/lists', (req, res) => {
   wunderlist.fetch_lists(process.env.WUNDERLIST_ACCESS_TOKEN).then(lists => {
     res.send({

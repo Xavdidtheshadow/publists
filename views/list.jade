@@ -1,0 +1,10 @@
+extends ./layout.jade
+
+block content  
+  .content
+    p.
+      These are your lists. Check the ones you'd like to make public!
+
+    ul
+      each task in tasks
+        li= task.title
