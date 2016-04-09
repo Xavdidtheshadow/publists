@@ -4,6 +4,7 @@ const favicon = require('serve-favicon');
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 const sassMiddleware = require('node-sass-middleware');
 
 const app = express();
@@ -40,7 +41,10 @@ app.use('/public', express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false })); 
 app.use(bodyParser.json());
 app.use(session({
-  secret: 'mySecret',
+  store: new RedisStore({
+    url: process.env.REDIS_URL
+  }),
+  secret: process.env.COOKIE_SECRET,
   saveUninitialized: false,
   resave: false
 }));
@@ -50,7 +54,6 @@ const wunderlist = require('./wunderlist');
 
 // CUSTOM MIDDLWARE
 function sessionPasser(req, res, next) {
-  console.log(Parse.User.current());
   if (req.session.user) {
     console.log(req.session.user);
     res.locals.user = {
@@ -75,11 +78,11 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
   var user = new Parse.User();
-  user.set('username', req.body.username);
-  user.set('password', req.body.password);
-  user.set('publicLists', []);
-
-  user.signUp(null, {
+  user.signUp({
+    username: req.body.username,
+    password: req.body.password,
+    publicLists: {}
+  }, {
     success: function(user) {
       // apparently parse stores info in localstorage too? 
       req.session.user = user;
@@ -134,13 +137,19 @@ app.get('/lists', (req, res) => {
 });
 
 app.get('/api/lists', (req, res) => {
-  wunderlist.fetch_lists().then(lists => {
-    res.send(lists);
+  wunderlist.fetch_lists(process.env.WUNDERLIST_ACCESS_TOKEN).then(lists => {
+    res.send({
+      lists: lists,
+      publicLists: req.session.user.publicLists
+    });
+  }).catch(err => {
+    console.log(err.message);
+    res.sendStatus(500);
   });
 });
 
 app.get('/api/lists/:lid/tasks' ,(req, res) => {
-  wunderlist.fetch_tasks_by_list_id(req.params.lid).then(tasks => {
+  wunderlist.fetch_tasks_by_list_id(req.params.lid, process.env.WUNDERLIST_ACCESS_TOKEN).then(tasks => {
     res.send(tasks);
   });
 });

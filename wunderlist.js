@@ -1,14 +1,14 @@
 'use strict';
 
 const request = require('request-promise');
+const merge = require('lodash.merge');
 const base_url = 'https://a.wunderlist.com/api/v1';
 
-let options = {
+const options = {
   transform: function(body) {
     return JSON.parse(body);
   },
   headers: {
-    'X-Access-Token': process.env.WUNDERLIST_ACCESS_TOKEN,
     'X-Client-ID': process.env.WUNDERLIST_CLIENT_ID
   }
 };
@@ -21,11 +21,18 @@ function lists_url() {
   return `${base_url}/lists`;
 }
 
+function build_options(access_token) {
+  return merge({
+    headers: {
+    'X-Access-Token': access_token
+  }}, options);
+}
+
 module.exports = {
-  fetch_tasks_by_list_id: lid => {
-    return request.get(tasks_url(lid), options);
+  fetch_tasks_by_list_id: (lid, token) => {
+    return request.get(tasks_url(lid), build_options(token));
   },
-  fetch_lists: () => {
-    return request.get(lists_url(), options);
+  fetch_lists: (token) => {
+    return request.get(lists_url(), build_options(token));
   }
 };
