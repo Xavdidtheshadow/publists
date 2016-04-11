@@ -65,8 +65,12 @@ app.post('/update', (req, res) => {
     User.findOneAndUpdate({
       wid: req.session.user.wid
     }, {
-      public_lists: req.body.lists
+      public_lists: req.body.public_lists
+    }, {
+      new: true,
+      runValidators: true
     }).then(u => {
+      console.log('postsave', u);
       req.session.user = u;
       console.log('saved!', req.session.user.public_lists);
       res.sendStatus(200);
@@ -107,10 +111,12 @@ app.get('/user/:wid/lists/:lid', (req, res, next) => {
 });
 
 app.get('/api/lists', (req, res) => {
+  // console.log('pre', req.session.user);
   wunderlist.fetch_lists(req.session.user.access_token).then(lists => {
+    // console.log('post', req.session.user);
     res.send({
       lists: lists,
-      public_lists: req.session.user.public_lists || {}
+      public_lists: req.session.user.public_lists
     });
   }).catch(err => {
     console.log(err.message);

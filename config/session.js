@@ -4,7 +4,7 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 
 function sessionPasser(req, res, next) {
-  console.log('user!!', req.session.user);
+  // console.log('user!!', req.session.user);
   res.locals.user = req.session.user ? true : false;
   next();
 }

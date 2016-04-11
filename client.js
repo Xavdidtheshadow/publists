@@ -21,7 +21,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
 
   $scope.save = function() {
     $http.post('/update', {
-      lists: $scope.model.public_lists
+      public_lists: $scope.model.public_lists
     }).then(function(resp) {
       $scope.model.message = "Saved!";
     }).catch(function(err) {
