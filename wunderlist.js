@@ -58,9 +58,7 @@ module.exports = {
   },
   // returns an array of results: [access_token, user]
   getAuthedUser: function(code) {
-    console.log('authing', code);
     return this.auth(code).then(data => {
-      console.log('authed code', data);
       return Promise.all([data, this.fetch_user(data.access_token)]);
     });
   }

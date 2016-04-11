@@ -15,17 +15,17 @@ let userSchema = mongoose.Schema({
   public_lists: {type: mongoose.Schema.Types.Mixed, default: {}}
 });
 
-userSchema.statics.login = function(id, access_token) {
+userSchema.statics.login = function(access_token, id) {
   return this.findOneAndUpdate({
-    wid: id.id
+    wid: id
   }, {
     // should encrypt this
     $set: { access_token: access_token }
   }, {
     upsert: true,
-    // return updated object
     new: true,
-    setDefaultsOnInsert: true
+    setDefaultsOnInsert: true,
+    runValidators: true
   });
 };
 

@@ -4,18 +4,20 @@ block content
   if user
     //- if user.wunderlistToken
     .content(ng-controller="ListsController")
+      | {{ model.public_lists }}
       p.
         These are your lists. Check the ones you'd like to make public!
 
       ul
-        li(ng-repeat="list in lists" ng-click="toggle(list)")
+        li(ng-repeat="list in model.lists" ng-click="toggle(list)")
           .row
-          input(type="checkbox" ng-model="model[list.id]")
+          input(type="checkbox" ng-model="model.public_lists[list.id]")
           //- a(href="/lists/{{list.id}}/tasks")
           | {{list.title}}
 
       .btn.btn-default(ng-click="save()").
         Save
+      span(ng-model="model.message")
   else
 
     include ./_wunderlist
