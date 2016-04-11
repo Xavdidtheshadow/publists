@@ -20,12 +20,14 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
   };
 
   $scope.save = function() {
+    $scope.model.message = null;
     $http.post('/update', {
       public_lists: $scope.model.public_lists
     }).then(function(resp) {
       $scope.model.message = "Saved!";
     }).catch(function(err) {
-      $scope.model.message = "Error!" + err;
+      console.log(err);
+      $scope.model.message = "Error (" + err.status + "): " + err.data.message;
     });
   };
 

@@ -17,7 +17,7 @@ block content
 
       .btn.btn-default(ng-click="save()").
         Save
-      span(ng-model="model.message")
+      span.left-pad(ng-bind="model.message")
   else
 
     include ./_wunderlist
