@@ -10,7 +10,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
     $http.get('/api/lists').then(function(res){
       // console.log('gotten');
       $scope.lists = res.data.lists;
-      $scope.model = res.data.publicLists;
+      $scope.model = res.data.public_lists;
     });
   };
 

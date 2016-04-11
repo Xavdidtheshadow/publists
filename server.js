@@ -1,21 +1,22 @@
 'use strict';
 
 const app = require('./config/setup')();
-require('./config/db')(app);
+require('./config/db'); // delcares User schema
 require('./config/session')(app);
+const User = require('mongoose').model('User');
 
 const wunderlist = require('./wunderlist');
 const request = require('request-promise');
 const urlLib = require('url');
 
-// seems silly to make a new file for 3 lines
-const Parse = require('parse/node');
-Parse.initialize(process.env.APP_ID, null, process.env.MASTER_KEY);
-Parse.serverURL = app.get('server_url');
-
 // ROUTES
 app.get('/', (req, res) => {
   res.render('index');
+});
+
+app.get('/logout', (req, res) => {
+  req.session.user = null;
+  res.redirect('/');
 });
 
 app.get('/auth', (req, res) => {
@@ -34,87 +35,22 @@ app.get('/auth', (req, res) => {
 app.get('/callback', (req, res) => {
   let code = req.query.code;
   console.log(code);
-  if (req.query.state === 'california' && req.session.user) {
+  if (req.query.state === 'california') {
     console.log('in callback inner!');
-    request({
-      method: 'POST',
-      uri: 'https://www.wunderlist.com/oauth/access_token',
-      body: {
-        client_id: process.env.WUNDERLIST_CLIENT_ID,
-        client_secret: process.env.WUNDERLIST_CLIENT_SECRET,
-        code: code
-      },
-      json: true
-    }).then(data => {
-      console.log('posted for access');
-      let q = new Parse.Query(Parse.User).equalTo("objectId", req.session.user.objectId);
-      q.first().then(u => {
-        console.log('fetched user', u);
-        u.save({access_token: data.access_token}, {useMasterKey: true}).then(newU => {
-          req.session.user = newU;
-          res.redirect('/');
-        }, (err) => {
-          console.log('err', err);
-          res.status(err.code).send({status: err.code, message: err.message});
-        });
-      }, err => {
-        console.log('this should not happen');
-        res.status(403).send({message: "Invalid userID"});
-      });
+    wunderlist.getAuthedUser(code).then(results => {
+      console.log('posted for access', results);
+      return User.login(results[1].id, results[0].access_token);
+    }).then(user => {
+      req.session.user = user;
+      res.redirect('/');
+    }).catch(err => {
+      // this could be a mongo or wunderlist error
+      console.log('err', err);
+      res.status(500).send({status: err.code, message: err.message});
     });
   } else {
     console.log('bad user?');
     res.sendStatus(500);
-  }
-});
-
-app.get('/login', (req, res) => {
-  res.render('login');
-});
-
-app.post('/login', (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    res.status(401).send({message: "Invalid Username or Password"});
-  } else {
-    Parse.User.logIn(
-      req.body.username.trim(), 
-      req.body.password.trim(), {
-        success: user => {
-          req.session.user = user;
-          res.redirect('/');
-        },
-        error: (user, error) => {
-          res.send({status: error.code, message: error.message});
-      }
-    });
-  }
-});
-
-app.get('/register', (req, res) => {
-  res.render('register');
-});
-
-app.post('/register', (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    res.status(401).send({message: "Missing Username or Password"});
-  } else {
-    console.log(req.body.username, req.body.password);
-    var user = new Parse.User();
-    user.signUp({
-      username: req.body.username.trim(),
-      password: req.body.password.trim(),
-      publicLists: {}
-    }, {
-      success: user => {
-        // apparently parse stores info in localstorage too? 
-        req.session.user = user;
-        // res.redirect('/wunderlistAuth');
-        res.redirect('/');
-      },
-      error: (user, error) => {
-        res.send({status: error.code, message: error.message});
-      }
-    });
   }
 });
 
@@ -126,20 +62,13 @@ app.post('/update', (req, res) => {
   if (!req.session.user) {
     res.status(401).send({message: "No session exists"});
   } else {
-    let q = new Parse.Query(Parse.User).equalTo("objectId", req.session.user.objectId);
-    q.first().then(u => {
-      console.log('fetched user', u);
-      u.save({publicLists: req.body.lists}, {useMasterKey: true}).then(newU => {
-        req.session.user = newU;
-        console.log('saved!', req.body.lists);
-        res.sendStatus(200);
-      }, (err) => {
-        console.log('err', err);
-        res.status(err.code).send({status: err.code, message: err.message});
-      });
-    }, err => {
-      console.log('err bottom');
-      res.status(403).send({message: "Invalid userID"});
+    User.update({wid: req.session.user.wid}, {public_lists: req.body.lists}).then(u => {
+      req.session.user = u;
+      console.log('saved!', req.session.user.public_lists);
+      res.sendStatus(200);
+    }).catch(err => {
+      console.log('err', err);
+      res.status(500).send({message: err});
     });
   }
 });
@@ -150,7 +79,8 @@ app.get('/lists', (req, res) => {
 
 app.get('/user/:uid/lists/:lid', (req, res, next) => {
   console.log('top of function!');
-  let q = new Parse.Query(Parse.User).equalTo("objectId", req.params.uid);
+  // find one {wid: req.params.uid}
+  // fix nested stuff 
   q.first().then(u => {
     let lists = u.get('publicLists');
 
@@ -175,7 +105,7 @@ app.get('/api/lists', (req, res) => {
   wunderlist.fetch_lists(req.session.user.access_token).then(lists => {
     res.send({
       lists: lists,
-      publicLists: req.session.user.publicLists
+      public_lists: req.session.user.public_lists
     });
   }).catch(err => {
     console.log(err.message);

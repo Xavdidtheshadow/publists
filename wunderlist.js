@@ -21,6 +21,10 @@ function lists_url() {
   return `${base_url}/lists`;
 }
 
+function user_url() {
+  return `${base_url}/user`;
+}
+
 function build_options(access_token) {
   return merge({
     headers: {
@@ -34,5 +38,30 @@ module.exports = {
   },
   fetch_lists: (token) => {
     return request.get(lists_url(), build_options(token));
+  },
+  fetch_user: (token) => {
+    return request.get(user_url(), build_options(token));
+  },
+  auth: code => {
+    let opts = {
+      method: 'POST',
+      uri: 'https://www.wunderlist.com/oauth/access_token',
+      body: {
+        client_id: process.env.WUNDERLIST_CLIENT_ID,
+        client_secret: process.env.WUNDERLIST_CLIENT_SECRET,
+        code: code
+      },
+      json: true
+    };
+
+    return request(opts);
+  },
+  // returns an array of results: [access_token, user]
+  getAuthedUser: function(code) {
+    console.log('authing', code);
+    return this.auth(code).then(data => {
+      console.log('authed code', data);
+      return Promise.all([data, this.fetch_user(data.access_token)]);
+    });
   }
 };

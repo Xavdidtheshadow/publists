@@ -2,4 +2,4 @@
 web: PORT=1337 nodemon --ignore client.js --ignore public/_bundle.js
 client: ./jsbuild
 # using mongolab now, don't need this
-# mongo: mongod
+mongo: mongod

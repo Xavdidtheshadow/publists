@@ -1,25 +1,33 @@
 'use strict';
 
-// setup the parse server!
-const ParseServer = require('parse-server').ParseServer;
+const mongoose = require('mongoose');
+// i think this is global?
+mongoose.connect('mongodb://localhost/unparse');
 
-module.exports = function(app) {
-  var databaseUri = process.env.DATABASE_URI || process.env.MONGOLAB_URI;
+let userSchema = mongoose.Schema({
+  wid: {
+    type: String,
+    required: true,
+    unique: true, // this is right from wlist, shouldn't be a problem
+    index: true
+  },
+  access_token: String,
+  public_lists: {type: mongoose.Schema.Types.Mixed, default: {}}
+});
 
-  if (!databaseUri) {
-    console.log('DATABASE_URI not specified, falling back to localhost.');
-  }
-
-  let api = new ParseServer({
-    databaseURI: databaseUri || 'mongodb://localhost:27017/dev',
-    // cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
-    appId: process.env.APP_ID,
-    masterKey: process.env.MASTER_KEY, 
-    serverURL: app.get('server_url')
+userSchema.statics.login = function(id, access_token) {
+  return this.findOneAndUpdate({
+    wid: id.id
+  }, {
+    // should encrypt this
+    $set: { access_token: access_token }
+  }, {
+    upsert: true,
+    // return updated object
+    new: true,
+    setDefaultsOnInsert: true
   });
-
-  // Serve the Parse API on the /parse URL prefix
-  var mountPath = '/parse';
-  // console.log(api);
-  app.use(mountPath, api);
 };
+
+// this is all hella global?
+mongoose.model('User', userSchema);
