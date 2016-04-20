@@ -5,6 +5,12 @@ block content
     p.
       These are your lists. Check the ones you'd like to make public!
 
-    ul
-      each task in tasks
-        li= task.title
+    if tasks.length > 0
+      ul
+        each task in tasks
+          li.nopoint= task.title
+
+    else
+      p.
+        This list has no incomete items!
+        

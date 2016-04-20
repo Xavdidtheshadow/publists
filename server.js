@@ -25,7 +25,7 @@ app.get('/auth', (req, res) => {
     host: 'www.wunderlist.com/oauth/authorize', 
     query: {
       client_id: process.env.WUNDERLIST_CLIENT_ID,
-      redirect_uri: 'https://de3543d3.ngrok.io/callback',
+      redirect_uri: 'https://51b21747.ngrok.io/callback',
       state: 'california' // i'm funny this'll either be a secret or uid or something?
     }
   });
@@ -85,28 +85,22 @@ app.get('/lists', (req, res) => {
   // res.render('lists');
 });
 
-app.get('/user/:wid/lists/:lid', (req, res, next) => {
-  console.log('top of function!');
-  // find one {wid: req.params.uid}
-  // fix nested stuff 
+app.get('/user/:wid/lists/:lid', (req, res) => {
   User.findOne({wid: req.params.wid}).then(user => {
-    if (user.public_lists[req.params.lid]) {
+    if (user.public_lists[req.params.lid] === true) {
       console.log('yeppin');
       return wunderlist.fetch_tasks_by_list_id(req.params.lid, user.access_token);
     } else {
-      // anything without the tasks key will work
-      console.log('nopin');
-      return Promise.resolve({nope: true});
+      return Promise.reject({code: 404});
     }
   }).then(data => {
-    if (data.tasks) {
-      res.render('list', {tasks: data.tasks});
-    } else {
-      res.status(404).send('list not found or not public');
-    }
+    res.render('list', {tasks: data});
   }).catch(err => {
-    console.log('wunderlist error');
-    res.status(500).send({error: err});
+    if (err.code === 404) {
+     res.status(404).send('list not found or not public'); 
+    } else {
+      res.status(500).send({error: err});
+    }
   });
 });
 

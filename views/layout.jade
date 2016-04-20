@@ -16,17 +16,17 @@ html(lang="en")
     .mid.container
       h1
         | Publists 
-        
-        if user
-          //- small
-            = user.username
 
       block content
-        p the content goes here
+        p the content goes here! It's not working, apparently
 
     footer.bot.container-fluid
       p
-        | This site was made by 
+        | This 
+        a(href="https://github.com/xavdidtheshadow/publists").
+          site
+        |  
+        | was made by 
         a(href="http://davidbrownman.com").
           David Brownman
         |  
