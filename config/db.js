@@ -12,15 +12,19 @@ let userSchema = mongoose.Schema({
     index: true
   },
   access_token: String,
+  name: {type: String, default: 'No Name'},
   public_lists: {type: mongoose.Schema.Types.Mixed, default: {}}
 });
 
-userSchema.statics.login = function(access_token, id) {
+userSchema.statics.login = function(access_token, id, name) {
   return this.findOneAndUpdate({
     wid: id
   }, {
     // should encrypt this
-    $set: { access_token: access_token }
+    $set: { 
+      access_token: access_token,
+      name: name
+    }
   }, {
     upsert: true,
     new: true,

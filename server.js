@@ -39,7 +39,7 @@ app.get('/callback', (req, res) => {
     console.log('in callback inner!');
     wunderlist.getAuthedUser(code).then(results => {
       console.log('posted for access', results);
-      return User.login(results[0].access_token, results[1].id);
+      return User.login(results[0].access_token, results[1].id, results[0].name);
     }).then(user => {
       req.session.user = user;
       res.redirect('/');
@@ -72,7 +72,7 @@ app.post('/update', (req, res) => {
     }).then(u => {
       console.log('postsave', u);
       req.session.user = u;
-      console.log('saved!', req.session.user.public_lists);
+      console.logg('saved!', req.session.user.public_lists);
       res.sendStatus(200);
     }).catch(err => {
       console.log('err', err);
@@ -81,8 +81,28 @@ app.post('/update', (req, res) => {
   }
 });
 
-app.get('/lists', (req, res) => {
-  // res.render('lists');
+app.get('/user/:wid/lists', (req, res) => {
+  User.findOne({wid: req.params.wid}).then(user => {
+    console.log(user);
+    return Promise.all([user, wunderlist.fetch_lists(user.access_token)]);
+  }).then(results => {
+    // [user, lists]
+    let public_lists = results[1].filter(list => {
+      return results[0].public_lists[list.id];
+    });
+
+    res.render('lists', {
+      wid: req.params.wid,
+      lists: public_lists,
+      name: results[0].name
+    });
+  }).catch(err => {
+    if (err.statusCode === 404) {
+     res.status(404).send('list not found or not public'); 
+    } else {
+      res.status(500).send({error: err});
+    }
+  });
 });
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
@@ -93,8 +113,11 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
     } else {
       return Promise.reject({code: 404});
     }
-  }).then(data => {
-    res.render('list', {tasks: data});
+  }).then(results => {
+    res.render('list', {
+      list: results[0],
+      tasks: results[1]
+    });
   }).catch(err => {
     if (err.code === 404) {
      res.status(404).send('list not found or not public'); 
@@ -117,12 +140,6 @@ app.get('/api/lists', (req, res) => {
     res.send(err);
   });
 });
-
-// app.get('/api/lists/:lid/tasks' ,(req, res) => {
-//   wunderlist.fetch_tasks_by_list_id(req.params.lid, process.env.WUNDERLIST_ACCESS_TOKEN).then(tasks => {
-//     res.send(tasks);
-//   });
-// });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -33,11 +33,14 @@ function build_options(access_token) {
 }
 
 module.exports = {
-  fetch_tasks_by_list_id: (lid, token) => {
-    return request.get(tasks_url(lid), build_options(token));
+  fetch_tasks_by_list_id: function(lid, token) {
+    return Promise.all([this.fetch_list(lid, token), request.get(tasks_url(lid), build_options(token))]);
   },
   fetch_lists: (token) => {
     return request.get(lists_url(), build_options(token));
+  },
+  fetch_list: (lid, token) => {
+    return request.get(`${lists_url()}/${lid}`, build_options(token));
   },
   fetch_user: (token) => {
     return request.get(user_url(), build_options(token));
