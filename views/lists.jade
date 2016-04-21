@@ -9,8 +9,9 @@ block content
       ul
         each list in lists
           li
-            a(href="/user/#{wid}/lists/#{list.id}")
-              = list.title
+            .linkbox
+              a(href="/user/#{wid}/lists/#{list.id}")
+                = list.title
 
     else
       p.

@@ -19,7 +19,7 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/auth', (req, res) => {
+app.get('/login', (req, res) => {
   let url = urlLib.format({
     protocol: 'https', 
     host: 'www.wunderlist.com/oauth/authorize', 
@@ -32,6 +32,15 @@ app.get('/auth', (req, res) => {
   res.redirect(url);
 });
 
+app.get('/profile', (req, res) => {
+  if (req.session.user) {
+    res.redirect(`/user/${req.session.user.wid}/lists`);
+  } else {
+    // is there a way to pass on profile as destination?
+    res.redirect('/login');
+  }
+});
+
 app.get('/callback', (req, res) => {
   let code = req.query.code;
   console.log(code);
@@ -39,7 +48,7 @@ app.get('/callback', (req, res) => {
     console.log('in callback inner!');
     wunderlist.getAuthedUser(code).then(results => {
       console.log('posted for access', results);
-      return User.login(results[0].access_token, results[1].id, results[0].name);
+      return User.login(results[0].access_token, results[1].id, results[1].name);
     }).then(user => {
       req.session.user = user;
       res.redirect('/');
@@ -52,10 +61,6 @@ app.get('/callback', (req, res) => {
     console.log('bad user?');
     res.sendStatus(500);
   }
-});
-
-app.get('/wunderlistAuth', (req, res) => {
-  res.render('wunderlistButton');
 });
 
 app.post('/update', (req, res) => {
@@ -72,7 +77,7 @@ app.post('/update', (req, res) => {
     }).then(u => {
       console.log('postsave', u);
       req.session.user = u;
-      console.logg('saved!', req.session.user.public_lists);
+      console.log('saved!', req.session.user.public_lists);
       res.sendStatus(200);
     }).catch(err => {
       console.log('err', err);
