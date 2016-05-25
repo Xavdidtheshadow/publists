@@ -24,6 +24,10 @@ function subtasks_url (lid) {
   return `${base_url}/subtasks?list_id=${lid}`
 }
 
+function subtask_positions_url (lid) {
+  return `${base_url}/subtask_positions?list_id=${lid}`
+}
+
 function notes_url (lid) {
   return `${base_url}/notes?list_id=${lid}`
 }
@@ -44,15 +48,40 @@ function build_options (access_token) {
   }, options)
 }
 
-// [ list, tasks, subtasks, notes ]
+function order_subtasks (subtasks, order) {
+  if (order.values.length === 0) {
+    return sortBy(subtasks, 'created_at')
+  } else {
+    let res = []
+    let indexed_tasks = groupBy(subtasks, 'id')
+    order.values.forEach((val) => {
+      // subtask might not exist
+      if (indexed_tasks[val]) {
+        res.push(indexed_tasks[val][0])
+        // so that we know which ones are left
+        delete indexed_tasks[val]
+      }
+    })
+    // add any remaining tasks
+    res.concat(sortBy(subtasks, 'created_at'))
+    return res
+  }
+}
+
+// [ list, tasks, subtasks, notes, orders ]
 function process_items (data) {
   let subtasks = groupBy(data[2], 'task_id')
   let notes = groupBy(data[3], 'task_id')
-  data[1].forEach((item, index) => {
-    data[1][index].subtasks = subtasks[item.id] ? sortBy(subtasks[item.id], 'created_at') : []
-    data[1][index].note = notes[item.id] ? notes[item.id][0].content : undefined
+  let orders = groupBy(data[4], 'task_id')
+  data[1].forEach((task, index) => {
+    // there's no reason that orders wouldn't be there, but you never know
+    if (subtasks[task.id] && orders[task.id]) {
+      data[1][index].subtasks = order_subtasks(subtasks[task.id], orders[task.id][0])
+    } else {
+      data[1][index].subtasks = []
+    }
+    data[1][index].note = notes[task.id] ? notes[task.id][0].content : undefined
   })
-  console.log(data[1])
   return data
 }
 
@@ -69,7 +98,8 @@ module.exports = {
       request.get(tasks_url(lid, false), build_options(token)),
       request.get(tasks_url(lid, true), build_options(token)),
       request.get(subtasks_url(lid), build_options(token)),
-      request.get(notes_url(lid), build_options(token))
+      request.get(notes_url(lid), build_options(token)),
+      request.get(subtask_positions_url(lid), build_options(token))
     ]).then(combine_tasks).then(process_items)
   },
   fetch_lists: (token) => {

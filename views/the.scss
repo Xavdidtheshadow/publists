@@ -93,6 +93,14 @@ body {
         input {
           margin-right: 10px;
         }
+
+        .balloon {
+          border-bottom: 1px dashed $dark_blue;
+        }
+
+        .glyphicon {
+          margin-right: 5px;
+        }
       }
 
       .nopoint {
@@ -100,7 +108,7 @@ body {
       }
 
       .subtask {
-        margin-left: 20px;
+        margin-left: 25px;
       }
     }
     // maybe I should make a package out of this

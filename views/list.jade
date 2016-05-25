@@ -9,14 +9,26 @@ block content
       ul
         each task in tasks
           li.nopoint
-            = task.title
+            if task.completed
+              span.glyphicon.glyphicon-check
+            else
+              span.glyphicon.glyphicon-unchecked
+
             if task.note
-              = ' - ' + task.note
+              span.balloon(data-balloon='#{task.note}' data-balloon-pos='right' data-balloon-length='fit')
+                = task.title
+            else
+              = task.title
           ul
             each subtask in task.subtasks
-              li.nopoint.subtask= subtask.title
+              li.nopoint.subtask
+                if subtask.completed
+                  span.glyphicon.glyphicon-check
+                else
+                  span.glyphicon.glyphicon-unchecked
+                    
+                = subtask.title
 
     else
       p.
         This list has no incomete items!
-        
