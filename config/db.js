@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 // i think this is global?
-mongoose.connect('mongodb://localhost/unparse');
+mongoose.connect('mongodb://localhost/unparse')
 
 let userSchema = mongoose.Schema({
   wid: {
@@ -14,14 +14,14 @@ let userSchema = mongoose.Schema({
   access_token: String,
   name: {type: String, default: 'No Name'},
   public_lists: {type: mongoose.Schema.Types.Mixed, default: {}}
-});
+})
 
-userSchema.statics.login = function(access_token, id, name) {
+userSchema.statics.login = function (access_token, id, name) {
   return this.findOneAndUpdate({
     wid: id
   }, {
     // should encrypt this
-    $set: { 
+    $set: {
       access_token: access_token,
       name: name
     }
@@ -30,8 +30,8 @@ userSchema.statics.login = function(access_token, id, name) {
     new: true,
     setDefaultsOnInsert: true,
     runValidators: true
-  });
-};
+  })
+}
 
 // this is all hella global?
-mongoose.model('User', userSchema);
+mongoose.model('User', userSchema)

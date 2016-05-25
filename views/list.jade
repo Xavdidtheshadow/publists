@@ -1,6 +1,6 @@
 extends ./layout.jade
 
-block content  
+block content
   .content
     h2
       = list.title
@@ -8,7 +8,13 @@ block content
     if tasks.length > 0
       ul
         each task in tasks
-          li.nopoint= task.title
+          li.nopoint
+            = task.title
+            if task.note
+              = ' - ' + task.note
+          ul
+            each subtask in task.subtasks
+              li.nopoint.subtask= subtask.title
 
     else
       p.

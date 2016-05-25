@@ -6,12 +6,13 @@ block content
       These are #{name}'s public lists.
 
     if lists.length > 0
-      ul
-        each list in lists
-          li
-            .linkbox
-              a(href="/user/#{wid}/lists/#{list.id}")
-                = list.title
+      .box
+        ul
+          each list in lists
+            li
+              .linkbox
+                a(href="/user/#{wid}/lists/#{list.id}")
+                  = list.title
 
     else
       p.

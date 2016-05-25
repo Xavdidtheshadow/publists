@@ -3,22 +3,25 @@ extends ./layout.jade
 block content
   if user
     //- if user.wunderlistToken
-    .content(ng-controller="ListsController" ng-cloak)
+    .content.ng-cloak(ng-controller="ListsController")
       p
         span(ng-show="loading").
           Loading...
         span(ng-hide="loading").
           These are your lists. Check the ones you'd like to make public!
 
-      ul
-        li(ng-repeat="list in model.lists" ng-click="toggle(list)")
-          .row
-          input(type="checkbox" ng-model="model.public_lists[list.id]")
-          | {{list.title}}
+      .box
+        ul
+          li(ng-repeat="list in model.lists" ng-click="toggle(list)")
+            a(ng-href="/user/#{wid}/lists/{{list.id}}" target="_blank")
+              span(class="glyphicon glyphicon-link")
 
-      .btn.btn-default(ng-click="save()").
-        Save
-      span.left-pad(ng-bind="model.message")
+            input(type="checkbox" ng-model="model.public_lists[list.id]")
+            | {{list.title}}
+
+        .btn.btn-default(ng-click="save()").
+          Save
+        span.left-pad(ng-bind="model.message")
 
   else
     p

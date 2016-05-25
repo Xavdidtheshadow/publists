@@ -5,11 +5,11 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "./jsbuild"
+    "postinstall": "NODE_ENV=production; ./jsbuild;"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Xavdidtheshadow/publists.git"
+    "url": "git+https://github.com/xavdid/publists.git"
   },
   "keywords": [
     "wunderlist"
@@ -17,9 +17,9 @@
   "author": "David Brownman <beamneocube@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Xavdidtheshadow/publists/issues"
+    "url": "https://github.com/xavdid/publists/issues"
   },
-  "homepage": "https://github.com/Xavdidtheshadow/publists#readme",
+  "homepage": "https://github.com/xavdid/publists#readme",
   "dependencies": {
     "angular": "^1.5.3",
     "body-parser": "^1.15.0",
@@ -29,7 +29,9 @@
     "express-session": "^1.13.0",
     "helmet": "^1.3.0",
     "jade": "^1.11.0",
+    "lodash.groupby": "^4.4.0",
     "lodash.merge": "^4.3.4",
+    "lodash.sortby": "^4.5.0",
     "mongoose": "^4.4.12",
     "node-sass-middleware": "^0.9.8",
     "request-promise": "^2.0.1",
