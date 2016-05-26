@@ -3,29 +3,29 @@ extends ./layout.jade
 block content
   if user
     //- if user.wunderlistToken
-    .content.ng-cloak(ng-controller="ListsController")
+    .content.ng-cloak(ng-controller='ListsController')
       p
-        span(ng-show="loading").
+        span(ng-show='loading').
           Loading...
-        span(ng-hide="loading").
+        span(ng-hide='loading').
           These are your lists. Check the ones you'd like to make public!
 
       .box
         ul
-          li(ng-repeat="list in model.lists" ng-click="toggle(list)")
-            a(ng-href="/user/#{wid}/lists/{{list.id}}" target="_blank")
-              span(class="glyphicon glyphicon-link")
-
-            input(type="checkbox" ng-model="model.public_lists[list.id]")
+          li(ng-repeat='list in model.lists' ng-click='toggle(list)')
+            input(type='checkbox' ng-model='model.public_lists[list.id]')
             | {{list.title}}
 
-        .btn.btn-default(ng-click="save()").
+          //- should this page link to the list at all? 
+          //- a(ng-href='/user/#{wid}/lists/{{list.id}}' target='_blank')
+          //-   span(class='glyphicon glyphicon-link')
+
+        .btn.btn-default(ng-click='save()').
           Save
-        span.left-pad(ng-bind="model.message")
+        span.left-pad(ng-bind='model.message')
 
   else
-    p
-      | Use the 
-      a(href="/login").
-        login
-      |  button above to authenticate with Wunderlist.
+    p.text-center
+      a.btn.btn-default.btn-lg(href='/login').
+        Authenticate
+      

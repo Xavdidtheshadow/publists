@@ -15,26 +15,22 @@ html(lang='en')
   body(ng-app='publists')
     nav.navbar.navbar-default
       .navbar-header
-        button(type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar")
+        button(type='button' class='navbar-toggle collapsed' data-toggle='collapse' data-target='#navbar')
           span.icon-bar
           span.icon-bar
           span.icon-bar
-        a.navbar-brand(href="/")
+        a.navbar-brand(href='/')
           | Publists
 
       .navbar-collapse.collapse#navbar
         ul.nav.navbar-nav
           if user
             li 
-              a(href="/profile")
+              a(href='/profile')
                 | Public Profile
             li
-              a(href="/logout")
+              a(href='/logout')
                 | Logout
-          else
-            li
-              a(href="/login")
-                | Login
 
     .mid.container
       block content
@@ -52,6 +48,6 @@ html(lang='en')
         |  
         | and is not affiliated with Wunderlist in any way.
 
-    script(src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous")
-    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")
+    script(src='https://code.jquery.com/jquery-2.2.3.min.js' integrity='sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=' crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js' integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS' crossorigin='anonymous')
     script(src='/public/_bundle.js')

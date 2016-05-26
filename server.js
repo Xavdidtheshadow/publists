@@ -18,6 +18,10 @@ app.get('/', (req, res) => {
   res.render('index', {title: title_maker('Index')})
 })
 
+app.get('/faq', (req, res) => {
+  res.render('faq', {title: title_maker('FAQs')})
+})
+
 app.get('/login', (req, res) => {
   let url = urlLib.format({
     protocol: 'https',
@@ -92,7 +96,8 @@ app.post('/update', (req, res) => {
 
 app.get('/user/:wid/lists', (req, res) => {
   User.findOne({wid: req.params.wid}).then((user) => {
-    console.log(user)
+    // console.log(user)
+    // only need the promise array because i'm houisting the variable
     return Promise.all([user, wunderlist.fetch_lists(user.access_token)])
   }).then((results) => {
     // [user, lists]
@@ -116,18 +121,18 @@ app.get('/user/:wid/lists', (req, res) => {
 })
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
-  let user
-  User.findOne({wid: req.params.wid}).then((u) => {
-    if (u.public_lists[req.params.lid] === true) {
+  let u
+  User.findOne({wid: req.params.wid}).then((user) => {
+    if (user.public_lists[req.params.lid] === true) {
       // console.log('yeppin')
-      user = u
-      return wunderlist.fetch_tasks_with_items(req.params.lid, u.access_token)
+      u = user
+      return wunderlist.fetch_tasks_with_items(req.params.lid, user.access_token)
     } else {
       return Promise.reject({code: 404})
     }
   }).then((results) => {
     res.render('list', {
-      user: user,
+      user: u,
       list: results[0],
       tasks: results[1],
       title: title_maker(results[0].title)
@@ -144,16 +149,20 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
 
 app.get('/api/lists', (req, res) => {
   // console.log('pre', req.session.user)
-  wunderlist.fetch_lists(req.session.user.access_token).then((lists) => {
-    // console.log('post', req.session.user)
-    res.send({
-      lists: lists,
-      public_lists: req.session.user.public_lists
+  if (!req.session.user) {
+    res.status(401).send('Unauthenticated')
+  } else {
+    wunderlist.fetch_lists(req.session.user.access_token).then((lists) => {
+      // console.log('post', req.session.user)
+      res.send({
+        lists: lists,
+        public_lists: req.session.user.public_lists
+      })
+    }).catch((err) => {
+      console.log(err.message)
+      res.send(err)
     })
-  }).catch((err) => {
-    console.log(err.message)
-    res.send(err)
-  })
+  }
 })
 
 app.use((err, req, res, next) => {
