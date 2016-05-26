@@ -9,9 +9,13 @@ const wunderlist = require('./wunderlist')
 // const request = require('request-promise')
 const urlLib = require('url')
 
+function title_maker (s) {
+  return `${s} - Publists`
+}
+
 // ROUTES
 app.get('/', (req, res) => {
-  res.render('index')
+  res.render('index', {title: title_maker('Index')})
 })
 
 app.get('/login', (req, res) => {
@@ -81,7 +85,7 @@ app.post('/update', (req, res) => {
       res.sendStatus(200)
     }).catch((err) => {
       console.log('err', err)
-      res.status(500).send({message: err})
+      res.status(500).send({message: err.toString()})
     })
   }
 })
@@ -99,29 +103,34 @@ app.get('/user/:wid/lists', (req, res) => {
     res.render('lists', {
       wid: req.params.wid,
       lists: public_lists,
-      name: results[0].name
+      name: results[0].name,
+      title: title_maker(`${results[0].name}'s lists`)
     })
   }).catch((err) => {
     if (err.statusCode === 404) {
       res.status(404).send('list not found or not public')
     } else {
-      res.status(500).send({error: err})
+      res.status(500).send({error: err.toString()})
     }
   })
 })
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
-  User.findOne({wid: req.params.wid}).then((user) => {
-    if (user.public_lists[req.params.lid] === true) {
+  let user
+  User.findOne({wid: req.params.wid}).then((u) => {
+    if (u.public_lists[req.params.lid] === true) {
       // console.log('yeppin')
-      return wunderlist.fetch_tasks_with_items(req.params.lid, user.access_token)
+      user = u
+      return wunderlist.fetch_tasks_with_items(req.params.lid, u.access_token)
     } else {
       return Promise.reject({code: 404})
     }
   }).then((results) => {
     res.render('list', {
+      user: user,
       list: results[0],
-      tasks: results[1]
+      tasks: results[1],
+      title: title_maker(results[0].title)
     })
   }).catch((err) => {
     if (err.code === 404) {

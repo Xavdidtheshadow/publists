@@ -5,7 +5,8 @@ html(lang='en')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
 
-    title Publists
+    title
+      = title || 'Publists'
 
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/balloon-css/0.2.4/balloon.min.css', crossorigin='anonymous')
@@ -35,7 +36,7 @@ html(lang='en')
               a(href="/login")
                 | Login
 
-    .mid.container-fluid
+    .mid.container
       block content
         p the content goes here! It's not working, apparently
 

@@ -3,6 +3,10 @@ extends ./layout.jade
 block content
   .content
     h2
+      small
+        a(href='/user/#{user.wid}/lists')
+          = user.name
+        |  &gt; 
       = list.title
 
     if tasks.length > 0
@@ -28,7 +32,6 @@ block content
                   span.glyphicon.glyphicon-unchecked
                     
                 = subtask.title
-
     else
       p.
         This list has no incomete items!

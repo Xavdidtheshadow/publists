@@ -87,12 +87,14 @@ function process_items (data) {
 
 function combine_tasks (data) {
   // combines the arrays of 1 and 2
-  data[1] = data[1].concat(data.splice(2, 1)[0])
+  let sorted = data[1].concat(data.splice(2, 1)[0])
+  data[1] = sortBy(sorted, 'created_at')
   return data
 }
 
 module.exports = {
   fetch_tasks_with_items: function (lid, token) {
+    // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),
       request.get(tasks_url(lid, false), build_options(token)),
