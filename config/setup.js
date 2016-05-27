@@ -34,7 +34,7 @@ module.exports = function () {
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
 
-  app.set('view engine', 'jade')
+  app.set('view engine', 'pug')
 
   app.use('/public', express.static(`${root_path}/public`))
   // app.use(favicon(`${root_path}/public/favicon.ico`))
