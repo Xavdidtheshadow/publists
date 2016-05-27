@@ -19,7 +19,7 @@ block content
               span.glyphicon.glyphicon-unchecked
 
             if task.note
-              span.balloon(data-balloon=task.note data-balloon-pos='right' data-balloon-length='medium')
+              span.balloon(data-toggle="tooltip" data-placement="right" title=task.note)
                 = task.title
             else
               = task.title
