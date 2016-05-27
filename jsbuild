@@ -9,4 +9,4 @@ else
     COMMAND="watchify"
 fi
 
-eval "$COMMAND client.js -o public/_bundle.js -v"
+eval "$COMMAND client.js -v -o public/_bundle.js"

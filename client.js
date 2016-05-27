@@ -1,8 +1,6 @@
 'use strict'
 
-const angular = require('angular')
-
-let app = angular.module('publists', [])
+var app = require('angular').module('publists', [])
 
 app.controller('ListsController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
   $scope.init = function () {
@@ -25,7 +23,7 @@ app.controller('ListsController', ['$scope', '$http', '$timeout', function ($sco
       public_lists: $scope.model.public_lists
     }).then(function (resp) {
       $scope.model.message = 'Saved!'
-      $timeout(() => {
+      $timeout(function () {
         $scope.model.message = null
       }, 2000)
     }).catch(function (err) {

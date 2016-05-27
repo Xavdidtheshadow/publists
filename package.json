@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "NODE_ENV=production; ./jsbuild;"
+    "postinstall": "NODE_ENV=production ./jsbuild;"
   },
   "repository": {
     "type": "git",
