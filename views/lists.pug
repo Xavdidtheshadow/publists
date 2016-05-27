@@ -11,7 +11,7 @@ block content
     .box
       ul
         each list in lists
-          li(onclick='location.href="/user/#{wid}/lists/#{list.id}"')
+          li(onclick=`location.href="/user/${wid}/lists/${list.id}"`)
             = list.title
   else
     p.

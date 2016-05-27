@@ -3,7 +3,7 @@ extends ./layout.pug
 block content
   h2
     small
-      a(href='/user/#{user.wid}/lists')
+      a(href=`/user/${user.wid}/lists`)
         = user.name
       |  &gt; 
     = list.title
@@ -19,7 +19,7 @@ block content
               span.glyphicon.glyphicon-unchecked
 
             if task.note
-              span.balloon(data-balloon='#{task.note}' data-balloon-pos='right' data-balloon-length='medium')
+              span.balloon(data-balloon=task.note data-balloon-pos='right' data-balloon-length='medium')
                 = task.title
             else
               = task.title

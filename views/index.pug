@@ -23,7 +23,7 @@ block content
             | {{ list.title }}
 
           //- should this page link to the list at all? 
-          //- a(ng-href='/user/#{wid}/lists/{{list.id}}' target='_blank')
+          //- a(ng-href=`/user/${wid}/lists/{{list.id}}` target='_blank')
           //-   span(class='glyphicon glyphicon-link')
 
         .btn.btn-default(ng-click='save()').
