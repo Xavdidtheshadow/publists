@@ -1,15 +1,15 @@
 extends ./layout.jade
 
 block content
-  .content
-    h2
-      small
-        a(href='/user/#{user.wid}/lists')
-          = user.name
-        |  &gt; 
-      = list.title
+  h2
+    small
+      a(href='/user/#{user.wid}/lists')
+        = user.name
+      |  &gt; 
+    = list.title
 
-    if tasks.length > 0
+  if tasks.length > 0
+    .box
       ul
         each task in tasks
           li.nopoint
@@ -32,6 +32,6 @@ block content
                   span.glyphicon.glyphicon-unchecked
                     
                 = subtask.title
-    else
-      p.
-        This list has no incomete items!
+  else
+    p.
+      This list is empty!

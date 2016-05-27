@@ -1,19 +1,18 @@
 extends ./layout.jade
 
 block content  
-  .content
+  h2
+    small
+      = name
+      |  &gt; 
+    | Lists
+
+  if lists.length > 0
+    .box
+      ul
+        each list in lists
+          li(onclick='location.href="/user/#{wid}/lists/#{list.id}"')
+            = list.title
+  else
     p.
-      These are #{name}'s public lists.
-
-    if lists.length > 0
-      .box
-        ul
-          each list in lists
-            li
-              .linkbox
-                a(href='/user/#{wid}/lists/#{list.id}')
-                  = list.title
-
-    else
-      p.
-        This user has no lists!
+      This user has no lists!

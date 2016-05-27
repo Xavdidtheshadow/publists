@@ -15,7 +15,10 @@ function title_maker (s) {
 
 // ROUTES
 app.get('/', (req, res) => {
-  res.render('index', {title: title_maker('Index')})
+  res.render('index', {
+    title: title_maker('Index'),
+    name: req.session.user ? req.session.user.name : ''
+  })
 })
 
 app.get('/faq', (req, res) => {
@@ -153,7 +156,6 @@ app.get('/api/lists', (req, res) => {
     res.status(401).send('Unauthenticated')
   } else {
     wunderlist.fetch_lists(req.session.user.access_token).then((lists) => {
-      // console.log('post', req.session.user)
       res.send({
         lists: lists,
         public_lists: req.session.user.public_lists

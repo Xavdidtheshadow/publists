@@ -2,19 +2,24 @@ extends ./layout.jade
 
 block content
   if user
-    //- if user.wunderlistToken
-    .content.ng-cloak(ng-controller='ListsController')
+    h2
+      small
+        = name || 'User'
+        |  &gt; 
+      | Settings
+
+    .ng-cloak(ng-controller='ListsController')
       p
         span(ng-show='loading').
           Loading...
         span(ng-hide='loading').
-          These are your lists. Check the ones you'd like to make public!
+          These are your wunderlists. Check the ones you'd like to make public!
 
       .box
         ul
           li(ng-repeat='list in model.lists' ng-click='toggle(list)')
             input(type='checkbox' ng-model='model.public_lists[list.id]')
-            | {{list.title}}
+            | {{ list.title }}
 
           //- should this page link to the list at all? 
           //- a(ng-href='/user/#{wid}/lists/{{list.id}}' target='_blank')
@@ -25,7 +30,11 @@ block content
         span.left-pad(ng-bind='model.message')
 
   else
-    p.text-center
-      a.btn.btn-default.btn-lg(href='/login').
-        Authenticate
+    h2 Public Lists
+    p
+      | The best part of making lists is being able to track items you need to remember. The second best part is being able to share those lists with other people. Mysteriously, Wunderlist pulled their public list feature, so we recreated it. 
+    p.
+      Authenticate with wunderlist to get started!
+    a.btn.btn-default.btn-lg(href='/login').
+      Authenticate
       
