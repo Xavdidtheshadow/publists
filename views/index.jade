@@ -14,7 +14,8 @@ block content
           Loading...
         span(ng-hide='loading').
           These are your wunderlists. Check the ones you'd like to make public!
-
+        //- pre
+          {{ model | json }}
       .box
         ul
           li(ng-repeat='list in model.lists' ng-click='toggle(list)')

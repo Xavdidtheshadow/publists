@@ -11,7 +11,7 @@ app.controller('ListsController', ['$scope', '$http', '$timeout', function ($sco
     $http.get('/api/lists').then(function (res) {
       $scope.loading = false
       $scope.model.lists = res.data.lists
-      $scope.model.public_lists = res.data.public_lists
+      $scope.model.public_lists = res.data.public_lists || {}
     })
   }
 

@@ -26,13 +26,16 @@ app.get('/faq', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+  let cb = app.get('production') ? 'https://publists.herokuapp.com/callback' : 'https://51b21747.ngrok.io/callback'
+
   let url = urlLib.format({
     protocol: 'https',
     host: 'www.wunderlist.com/oauth/authorize',
     query: {
       client_id: process.env.WUNDERLIST_CLIENT_ID,
-      redirect_uri: 'https://51b21747.ngrok.io/callback',
-      state: 'california' // i'm funny this'll either be a secret or uid or something?
+      // redirect_uri: 'https://publists.herokuapp.com',
+      redirect_uri: cb,
+      state: process.env.STATE
     }
   })
   res.redirect(url)
@@ -55,7 +58,7 @@ app.get('/profile', (req, res) => {
 app.get('/callback', (req, res) => {
   let code = req.query.code
   // console.log(code)
-  if (req.query.state === 'california') {
+  if (req.query.state === process.env.STATE) {
     // console.log('in callback inner!')
     wunderlist.getAuthedUser(code).then((results) => {
       // console.log('posted for access', results)

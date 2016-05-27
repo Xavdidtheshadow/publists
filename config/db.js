@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose')
 // i think this is global?
-mongoose.connect('mongodb://localhost/unparse')
+mongoose.connect(process.env.MONGOLAB_URI)
 // Here's the required crypto code
 const crypto = require('crypto')
 const algo = 'aes-256-cbc'
