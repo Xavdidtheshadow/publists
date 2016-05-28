@@ -6,7 +6,13 @@
     "request": "registry:npm/request#2.69.0+20160428223725"
   },
   "globalDependencies": {
+    "express": "registry:dt/express#4.0.0+20160317120654",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
+    "express-session": "registry:dt/express-session#0.0.0+20160331200931",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "mongoose": "registry:dt/mongoose#3.8.5+20160517033907",
     "node": "registry:dt/node#6.0.0+20160524002506",
-    "request-promise": "registry:dt/request-promise#0.4.2+20160316155526"
+    "request-promise": "registry:dt/request-promise#0.4.2+20160316155526",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160501131543"
   }
 }

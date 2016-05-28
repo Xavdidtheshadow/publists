@@ -1,7 +1,7 @@
 'use strict'
 
-import request = require('request-promise')
-import _ = require("lodash")
+const request = require('request-promise')
+const _ = require("lodash")
 
 const base_url = 'https://a.wunderlist.com/api/v1'
 
