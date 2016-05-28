@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false
+    }, 
+    "files": [
+        "wunderlist.ts",
+        "typings/index.d.ts",
+        "types.d.ts"
+    ]
+}

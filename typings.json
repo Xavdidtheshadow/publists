@@ -1,0 +1,12 @@
+{
+  "name": "publists",
+  "dependencies": {
+    "bluebird": "registry:npm/bluebird#3.3.4+20160515010139",
+    "lodash": "registry:npm/lodash#4.0.0+20160416211519",
+    "request": "registry:npm/request#2.69.0+20160428223725"
+  },
+  "globalDependencies": {
+    "node": "registry:dt/node#6.0.0+20160524002506",
+    "request-promise": "registry:dt/request-promise#0.4.2+20160316155526"
+  }
+}
