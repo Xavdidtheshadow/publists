@@ -35,14 +35,14 @@ function build_options(access_token) {
         }
     }, options);
 }
-function order_subtasks(subtasks, order) {
-    if (order.values.length === 0) {
+function order_subtasks(subtasks, pos) {
+    if (pos.values.length === 0) {
         return _.sortBy(subtasks, 'created_at');
     }
     else {
         let res = [];
         let indexed_tasks = _.groupBy(subtasks, 'id');
-        order.values.forEach((val) => {
+        pos.values.forEach((val) => {
             if (indexed_tasks[val]) {
                 res.push(indexed_tasks[val][0]);
                 delete indexed_tasks[val];
@@ -68,9 +68,9 @@ function process_items(data) {
     return data;
 }
 function combine_tasks(data) {
-    let sorted = data[1].concat(data.splice(2, 1)[0]);
-    data[1] = _.sortBy(sorted, 'created_at');
-    return data;
+    let big = data[1].concat(data[2]);
+    let sorted = _.sortBy(big, 'created_at');
+    return [data[0], sorted, data[3], data[4], data[5]];
 }
 module.exports = {
     fetch_tasks_with_items: function (lid, token) {
