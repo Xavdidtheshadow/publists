@@ -9,7 +9,7 @@
         "wunderlist.ts",
         "typings/index.d.ts",
         "types.d.ts",
-        // "config/setup.ts",
+        "config/setup.ts",
         "config/db.ts",
         "config/session.ts"
     ]
