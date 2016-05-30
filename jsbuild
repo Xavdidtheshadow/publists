@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # triggers watchify locally and will also be the build script in production
-echo 'var' $NODE_ENV
 
 if [ "$NODE_ENV" = "production" ];then
     COMMAND="browserify -g uglifyify"

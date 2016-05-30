@@ -43,11 +43,3 @@ interface User {
   name: string,
   public_lists: {[s:string]: boolean}
 }
-
-interface FindAndUpdateOption {
-  new?: boolean,
-  upsert?: boolean,
-  sort?: Object,
-  select?: Object,
-  runValidators?: boolean
-}

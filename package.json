@@ -5,9 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "NODE_ENV=production ./jsbuild;",
-    "build": "rm -rf dist && tsc",
-    "prepublish": "typings install && npm run build"
+    "postinstall": "NODE_ENV=production ./jsbuild && typings i && tsc",
+    "clean": "rm -rf node_modules typings"
   },
   "repository": {
     "type": "git",
@@ -36,6 +35,8 @@
     "pug": "^2.0.0-alpha8",
     "request-promise": "^2.0.1",
     "serve-favicon": "^2.3.0",
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4",
     "uglifyify": "^3.0.1"
   },
   "devDependencies": {

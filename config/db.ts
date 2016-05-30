@@ -1,6 +1,6 @@
 'use strict'
 
-import mongoose = require('mongoose')
+const mongoose = require('mongoose')
 mongoose.connect(process.env.MONGOLAB_URI)
 
 import crypto = require('crypto')

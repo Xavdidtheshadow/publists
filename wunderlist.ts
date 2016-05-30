@@ -1,7 +1,7 @@
 'use strict'
 
 import request = require('request-promise')
-import _ = require("lodash")
+import _ = require('lodash')
 
 const base_url = 'https://a.wunderlist.com/api/v1'
 
@@ -67,8 +67,7 @@ function order_subtasks (subtasks:Subtask[], pos:Position) {
   }
 }
 
-// [ list, tasks, subtasks, notes, orders ]
-function process_items (data:[List[], Task[], Subtask[], Note[], Position[]]) {
+function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
   let subtasks = _.groupBy(data[2], 'task_id')
   let notes = _.groupBy(data[3], 'task_id')
   let orders = _.groupBy(data[4], 'task_id')
@@ -84,15 +83,13 @@ function process_items (data:[List[], Task[], Subtask[], Note[], Position[]]) {
   return data
 }
 
-function combine_tasks(data:[List[], Task[], Task[], Subtask[], Note[], Position[]]) {
-  // combines the arrays of 1 and 2
-  let big = data[1].concat(data[2])
-  let sorted = _.sortBy(big, 'created_at')
+function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]]) {
+  let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
   return [data[0], sorted, data[3], data[4], data[5]]
 }
 
 export = {
-  fetch_tasks_with_items: function(lid, token):Promise<[List[], Task[], Subtask[], Note[], Position[]]> {
+  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[], Subtask[], Note[], Position[]]> {
     // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),

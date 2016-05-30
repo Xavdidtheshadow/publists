@@ -8,7 +8,7 @@ import path = require('path')
 
 const root_path = path.join(__dirname, '..')
 
-export = function () {
+module.exports = function () {
   const app = express()
 
   app.set('port', (process.env.PORT))

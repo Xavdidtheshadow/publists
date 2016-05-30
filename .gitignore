@@ -41,4 +41,5 @@ typings
 public/_bundle.js
 
 # eventually it'll be all ts
-# *.js
+*.js
+**/*.js
