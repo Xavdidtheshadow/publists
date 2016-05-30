@@ -14,7 +14,7 @@ function sessionPasser (req, res, next) {
   next()
 }
 
-module.exports = function (app) {
+export = function (app) {
   app.use(session({
     store: new RedisStore({
       url: process.env.REDIS_URL

@@ -3,13 +3,14 @@
 const app = require('./config/setup')()
 require('./config/db') // delcares User schema
 require('./config/session')(app)
+
 const User = require('mongoose').model('User')
 
-const wunderlist = require('./wunderlist')
+import wunderlist = require('./wunderlist')
 // const request = require('request-promise')
-const urlLib = require('url')
+import urlLib = require('url')
 
-function title_maker (s) {
+function title_maker (s:string) {
   return `${s} - Publists`
 }
 
@@ -26,7 +27,7 @@ app.get('/faq', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  let cb = app.get('production') ? 'https://publists.herokuapp.com/callback' : 'https://51b21747.ngrok.io/callback'
+  let cb_url = app.get('production') ? 'https://publists.herokuapp.com/callback' : 'https://51b21747.ngrok.io/callback'
 
   let url = urlLib.format({
     protocol: 'https',
@@ -34,7 +35,7 @@ app.get('/login', (req, res) => {
     query: {
       client_id: process.env.WUNDERLIST_CLIENT_ID,
       // redirect_uri: 'https://publists.herokuapp.com',
-      redirect_uri: cb,
+      redirect_uri: cb_url,
       state: process.env.STATE
     }
   })
@@ -56,14 +57,14 @@ app.get('/profile', (req, res) => {
 })
 
 app.get('/callback', (req, res) => {
-  let code = req.query.code
+  let code:string = req.query.code
   // console.log(code)
   if (req.query.state === process.env.STATE) {
     // console.log('in callback inner!')
     wunderlist.getAuthedUser(code).then((results) => {
       // console.log('posted for access', results)
       return User.login(results[0].access_token, results[1].id, results[1].name)
-    }).then((user) => {
+    }).then((user:User) => {
       req.session.user = user
       res.redirect('/')
     }).catch((err) => {
@@ -128,7 +129,7 @@ app.get('/user/:wid/lists', (req, res) => {
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
   let u
-  User.findOne({wid: req.params.wid}).then((user) => {
+  User.findOne({wid: req.params.wid}).then((user):Promise<any> => {
     if (user.public_lists[req.params.lid] === true) {
       // console.log('yeppin')
       u = user
@@ -136,7 +137,7 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
     } else {
       return Promise.reject({code: 404})
     }
-  }).then((results) => {
+  }).then((results:[List[], Task[], Subtask[], Note[], Position[]]) => {
     res.render('list', {
       user: u,
       list: results[0],

@@ -11,7 +11,6 @@
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
     "express-session": "registry:dt/express-session#0.0.0+20160331200931",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
-    "mongoose": "registry:dt/mongoose#3.8.5+20160517033907",
     "node": "registry:dt/node#6.0.0+20160524002506",
     "node-sass": "registry:dt/node-sass#0.0.0+20160316155526",
     "node-sass-middleware": "registry:dt/node-sass-middleware#0.0.0+20160131121619",

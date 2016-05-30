@@ -1,7 +1,7 @@
 'use strict'
 
-const request = require('request-promise')
-const _ = require("lodash")
+import request = require('request-promise')
+import _ = require("lodash")
 
 const base_url = 'https://a.wunderlist.com/api/v1'
 
@@ -91,8 +91,8 @@ function combine_tasks(data:[List[], Task[], Task[], Subtask[], Note[], Position
   return [data[0], sorted, data[3], data[4], data[5]]
 }
 
-module.exports = {
-  fetch_tasks_with_items: function (lid, token) {
+export = {
+  fetch_tasks_with_items: function(lid, token):Promise<[List[], Task[], Subtask[], Note[], Position[]]> {
     // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),

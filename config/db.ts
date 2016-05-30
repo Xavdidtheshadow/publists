@@ -40,7 +40,7 @@ let userSchema = new mongoose.Schema({
 
 userSchema.set('toJSON', { getters: true })
 
-userSchema.method(('login'), function(access_token:string, id:number, name:string) {
+userSchema.method(('login'), function(access_token:string, id:number, name:string):User {
   return this.findOneAndUpdate({
     wid: id
   }, {
@@ -58,4 +58,4 @@ userSchema.method(('login'), function(access_token:string, id:number, name:strin
 })
 
 // this is all hella global?
-mongoose.model('User', userSchema)
+export = mongoose.model('User', userSchema)
