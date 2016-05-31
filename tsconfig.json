@@ -8,6 +8,7 @@
     "files": [
         "wunderlist.ts",
         "server.ts",
+        "client.ts",
         "typings/index.d.ts",
         "types.d.ts",
         "config/setup.ts",

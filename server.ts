@@ -27,19 +27,23 @@ app.get('/faq', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  let cb_url = app.get('production') ? 'https://publists.herokuapp.com/callback' : 'https://51b21747.ngrok.io/callback'
+  if (app.get('production')) {
+    let cb_url = 'https://publists.herokuapp.com/callback'
 
-  let url = urlLib.format({
-    protocol: 'https',
-    host: 'www.wunderlist.com/oauth/authorize',
-    query: {
-      client_id: process.env.WUNDERLIST_CLIENT_ID,
-      // redirect_uri: 'https://publists.herokuapp.com',
-      redirect_uri: cb_url,
-      state: process.env.STATE
-    }
-  })
-  res.redirect(url)
+    let url = urlLib.format({
+        protocol: 'https',
+        host: 'www.wunderlist.com/oauth/authorize',
+        query: {
+            client_id: process.env.WUNDERLIST_CLIENT_ID,
+            // redirect_uri: 'https://publists.herokuapp.com',
+            redirect_uri: cb_url,
+            state: process.env.STATE
+        }
+    })
+    res.redirect(url)
+  } else {
+    res.redirect('/callback')
+  }
 })
 
 app.get('/logout', (req, res) => {
@@ -71,6 +75,11 @@ app.get('/callback', (req, res) => {
       // this could be a mongo or wunderlist error
       console.log('err', err)
       res.status(500).send({status: err.code, message: err.message})
+    })
+  } else if (!app.get('production')) {
+    User.login_locally().then((user: User) => {
+      req.session.user = user
+      res.redirect('/')
     })
   } else {
     console.log('bad user?')

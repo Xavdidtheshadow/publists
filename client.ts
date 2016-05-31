@@ -1,19 +1,23 @@
 'use strict'
 
-var app = require('angular').module('publists', [])
+import angular = require('angular')
+var app = angular.module('publists', [])
 
-app.controller('ListsController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
+app.controller('ListsController', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
   $scope.init = function () {
     $scope.model = {}
     $scope.loading = true
-    $http.get('/api/lists').then(function (res) {
+    $http.get('/api/lists').then(function(res: { data: { 
+      lists: List[],
+      public_lists: {[s:string]: boolean}
+    }}) {
       $scope.loading = false
       $scope.model.lists = res.data.lists
       $scope.model.public_lists = res.data.public_lists || {}
     })
   }
 
-  $scope.toggle = function (list) {
+  $scope.toggle = function (list:List) {
     $scope.model.public_lists[list.id] = !$scope.model.public_lists[list.id]
   }
 
@@ -28,7 +32,7 @@ app.controller('ListsController', ['$scope', '$http', '$timeout', function ($sco
       }, 2000)
     }).catch(function (err) {
       console.log(err)
-      $scope.model.message = 'Error (' + err.status + '): ' + err.data.message
+      $scope.model.message = `Error (${err.status}): ${err.data.message}`
     })
   }
 

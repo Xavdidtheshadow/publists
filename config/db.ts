@@ -5,9 +5,9 @@ mongoose.connect(process.env.MONGOLAB_URI)
 
 import crypto = require('crypto')
 // these are string literals because that's what .update expects
-let algo: 'aes-256-cbc'
-let encoding: 'utf8'
-let format: 'hex'
+let algo: 'aes-256-cbc' = 'aes-256-cbc'
+let encoding: 'utf8' = 'utf8'
+let format: 'hex' = 'hex'
 
 // encryption adapted from here: https://gist.github.com/kljensen/7505729
 function encrypt (text:string) {
@@ -40,7 +40,7 @@ let userSchema = new mongoose.Schema({
 
 userSchema.set('toJSON', { getters: true })
 
-userSchema.method(('login'), function(access_token:string, id:number, name:string):User {
+userSchema.statics.login = function(access_token:string, id:number, name:string):User {
   return this.findOneAndUpdate({
     wid: id
   }, {
@@ -55,7 +55,12 @@ userSchema.method(('login'), function(access_token:string, id:number, name:strin
       setDefaultsOnInsert: true,
       runValidators: true
     })
-})
+}
+
+userSchema.statics.login_locally = function():User {
+  // my user id! change it for your local dev
+  return this.findOne({ wid: 6452502 })
+}
 
 // this is all hella global?
 export = mongoose.model('User', userSchema)

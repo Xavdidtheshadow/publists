@@ -7,7 +7,7 @@ interface Task {
   list_id: number,
   starred: boolean,
   title: string,
-  // I add these manually later during contensation
+  // I add these manually later during condensation
   subtasks?: Subtask[],
   note?: string
 }

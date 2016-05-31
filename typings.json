@@ -6,10 +6,12 @@
     "request": "registry:npm/request#2.69.0+20160428223725"
   },
   "globalDependencies": {
+    "angular": "registry:dt/angular#1.5.0+20160517064839",
     "body-parser": "registry:dt/body-parser#0.0.0+20160317120654",
     "express": "registry:dt/express#4.0.0+20160317120654",
     "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
     "express-session": "registry:dt/express-session#0.0.0+20160331200931",
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "registry:dt/node#6.0.0+20160524002506",
     "node-sass": "registry:dt/node-sass#0.0.0+20160316155526",

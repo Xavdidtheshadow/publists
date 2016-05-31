@@ -17,10 +17,8 @@ module.exports = function () {
   app.set('production', process.env.NODE_ENV === 'production')
   // local only
   if (app.get('production')) {
-    app.set('server_url', 'https://publists.herokuapp.com/parse')
+    // nothing?
   } else {
-    app.set('server_url', `http://localhost:${process.env.PORT}/parse`)
-    // app.set('server_url', `https://de3543d3.ngrok.io/parse`)
     require('dotenv').load()
   }
 
