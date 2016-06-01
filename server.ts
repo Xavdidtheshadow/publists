@@ -28,7 +28,8 @@ app.get('/faq', (req, res) => {
 
 app.get('/login', (req, res) => {
   if (app.get('production')) {
-    let cb_url = 'https://publists.herokuapp.com/callback'
+    // let cb_url = 'https://publists.herokuapp.com/callback'
+    let cb_url = `${req.protocol}://${req.hostname}/callback`
 
     let url = urlLib.format({
         protocol: 'https',
