@@ -1,5 +1,6 @@
 # start processes
-web: PORT=1337 nodemon --ignore client.js --ignore public/_bundle.js
+server: PORT=1337 nodemon --delay 2 --ignore client.js --ignore public/_bundle.js
 client: ./jsbuild
+typescript: tsc -w
 # using mongolab now, don't need this
-mongo: mongod
+# mongo: mongod

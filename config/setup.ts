@@ -1,10 +1,12 @@
 'use strict'
 
-const bodyParser = require('body-parser')
+import bodyParser = require('body-parser')
 // const favicon = require('serve-favicon')
-const sassMiddleware = require('node-sass-middleware')
-const express = require('express')
-const root_path = require('path').join(__dirname, '..')
+import sassMiddleware = require('node-sass-middleware')
+import express = require('express')
+import path = require('path')
+
+const root_path = path.join(__dirname, '..')
 
 module.exports = function () {
   const app = express()
@@ -15,10 +17,8 @@ module.exports = function () {
   app.set('production', process.env.NODE_ENV === 'production')
   // local only
   if (app.get('production')) {
-    app.set('server_url', 'https://publists.herokuapp.com/parse')
+    // nothing?
   } else {
-    app.set('server_url', `http://localhost:${process.env.PORT}/parse`)
-    // app.set('server_url', `https://de3543d3.ngrok.io/parse`)
     require('dotenv').load()
   }
 

@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": false,
+        "removeComments": true
+    }, 
+    "files": [
+        "wunderlist.ts",
+        "server.ts",
+        "client.ts",
+        "typings/index.d.ts",
+        "types.d.ts",
+        "config/setup.ts",
+        "config/db.ts",
+        "config/session.ts"
+    ]
+}

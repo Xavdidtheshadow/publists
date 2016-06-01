@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "NODE_ENV=production ./jsbuild;"
+    "postinstall": "typings i && tsc && NODE_ENV=production ./jsbuild",
+    "clean": "rm -rf node_modules typings"
   },
   "repository": {
     "type": "git",
@@ -28,15 +29,14 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "helmet": "^1.3.0",
-    "lodash.groupby": "^4.4.0",
-    "lodash.merge": "^4.3.4",
-    "lodash.sortby": "^4.5.0",
+    "lodash": "^4.13.1",
     "mongoose": "^4.4.12",
     "node-sass-middleware": "^0.9.8",
     "pug": "^2.0.0-alpha8",
     "request-promise": "^2.0.1",
     "serve-favicon": "^2.3.0",
-    "uglifyify": "^3.0.1"
+    "typescript": "^1.8.10",
+    "typings": "^1.0.4"
   },
   "devDependencies": {
     "dotenv": "^2.0.0"
