@@ -1,0 +1,43 @@
+{
+  "name": "publists",
+  "description": "Public wunderlists",
+  "scripts": {
+  },
+  "env": {
+    "COOKIE_SECRET": {
+      "required": true
+    },
+    "MONGOLAB_URI": {
+      "required": true
+    },
+    "SERVER_SECRET": {
+      "required": true
+    },
+    "STATE": {
+      "required": true
+    },
+    "WUNDERLIST_ACCESS_TOKEN": {
+      "required": true
+    },
+    "WUNDERLIST_CLIENT_ID": {
+      "required": true
+    },
+    "WUNDERLIST_CLIENT_SECRET": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "mongolab",
+    "heroku-redis"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
