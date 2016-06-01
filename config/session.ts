@@ -5,6 +5,8 @@ let RedisStore = require('connect-redis')(session)
 
 function sessionPasser (req, res, next) {
   if (req.session === undefined) {
+    console.debug(req)
+    console.log(process.env.REDIS_URL)
     console.error('!! Unable to access session, check redis connection !!')
     process.exit(1)
   } else if (req.session.user) {
