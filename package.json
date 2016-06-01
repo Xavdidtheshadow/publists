@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "NODE_ENV=production ./jsbuild && typings i && tsc",
-    "bootstrap": "npm i && typings i",
+    "postinstall": "typings i && tsc && NODE_ENV=production ./jsbuild",
     "clean": "rm -rf node_modules typings"
   },
   "repository": {
@@ -37,8 +36,7 @@
     "request-promise": "^2.0.1",
     "serve-favicon": "^2.3.0",
     "typescript": "^1.8.10",
-    "typings": "^1.0.4",
-    "uglifyify": "^3.0.1"
+    "typings": "^1.0.4"
   },
   "devDependencies": {
     "dotenv": "^2.0.0"
