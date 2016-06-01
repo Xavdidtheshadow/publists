@@ -28,8 +28,8 @@ app.get('/faq', (req, res) => {
 
 app.get('/login', (req, res) => {
   if (app.get('production')) {
-    // let cb_url = 'https://publists.herokuapp.com/callback'
-    let cb_url = `${req.protocol}://${req.hostname}/callback`
+    // this is the only thing that works for wunderlist, so no reason to make it any sort of variable
+    let cb_url = 'https://publists.herokuapp.com/callback'
 
     let url = urlLib.format({
         protocol: 'https',
