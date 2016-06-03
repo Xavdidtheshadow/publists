@@ -72,7 +72,6 @@ body {
         margin: 4px;
         background-color: $white;
         border-radius: 5px;
-        cursor: pointer;
 
         border: 1px solid $dark_grey;
 
@@ -87,20 +86,13 @@ body {
         .glyphicon {
           margin-right: 5px;
         }
+      }
 
+      .clickable {
+        cursor: pointer;
         &:hover {
           background-color: $grey;
         }
-      }
-
-      .nohover {
-        &:hover {
-          background-color: $white;
-        }
-      }
-
-      .nopoint {
-        cursor: inherit;
       }
 
       .subtask {

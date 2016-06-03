@@ -18,7 +18,7 @@ block content
           {{ model | json }}
       .box
         ul
-          li(ng-repeat='list in model.lists' ng-click='toggle(list)')
+          li.clickable(ng-repeat='list in model.lists' ng-click='toggle(list)')
             input(type='checkbox' ng-model='model.public_lists[list.id]')
             | {{ list.title }}
 

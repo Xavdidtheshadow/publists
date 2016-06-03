@@ -8,11 +8,14 @@ block content
       |  &gt; 
     = list.title
 
+  p.
+    This is the current state of the list. Click a task for more info.
+
   if tasks.length > 0
     .box
       ul
         each task in tasks
-          li.nopoint.nohover
+          li
             if task.completed
               span.glyphicon.glyphicon-check
             else
@@ -25,7 +28,7 @@ block content
               = task.title
           ul
             each subtask in task.subtasks
-              li.nopoint.subtask
+              li.subtask
                 if subtask.completed
                   span.glyphicon.glyphicon-check
                 else
