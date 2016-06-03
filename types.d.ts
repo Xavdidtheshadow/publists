@@ -18,6 +18,11 @@ interface List {
   title: string
 }
 
+interface ListRecord {
+  public: boolean,
+  lid: string
+}
+
 interface Position {
   id: number,
   values: number[],
@@ -41,5 +46,10 @@ interface User {
   wid: string,
   access_token: string,
   name: string,
-  public_lists: {[s:string]: boolean}
+  public_lists: ListRecord[]
+}
+
+interface ListInfo {
+  public: boolean,
+  username: string
 }

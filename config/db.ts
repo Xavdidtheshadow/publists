@@ -9,6 +9,8 @@ let algo: 'aes-256-cbc' = 'aes-256-cbc'
 let encoding: 'utf8' = 'utf8'
 let format: 'hex' = 'hex'
 
+import _ = require('lodash')
+
 // encryption adapted from here: https://gist.github.com/kljensen/7505729
 function encrypt (text:string) {
   let cipher = crypto.createCipher(algo, process.env.SERVER_SECRET)
@@ -35,7 +37,7 @@ let userSchema = new mongoose.Schema({
   // setter is used in findOneAndUpdate
   access_token: {type: String, get: decrypt},
   name: {type: String, default: 'No Name'},
-  public_lists: {type: mongoose.Schema.Types.Mixed, default: {}}
+  public_lists: { type: [ {lid: String, public: Boolean} ], default: [] }
 })
 
 userSchema.set('toJSON', { getters: true })
@@ -55,6 +57,15 @@ userSchema.statics.login = function(access_token:string, id:number, name:string)
       setDefaultsOnInsert: true,
       runValidators: true
     })
+}
+
+userSchema.methods.lid_is_public = function(lid: string):boolean {
+  let list = <ListRecord> _.find(this.public_lists, {lid: lid})
+  if (!list) {
+    return undefined
+  } else {
+    return list.public
+  }
 }
 
 userSchema.statics.login_locally = function():User {

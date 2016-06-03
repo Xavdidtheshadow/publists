@@ -83,22 +83,19 @@ function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
   return data
 }
 
-function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]]) {
+function combine_tasks(data:[List, Task[], Task[]]) {
   let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
-  return [data[0], sorted, data[3], data[4], data[5]]
+  return [data[0], sorted]
 }
 
 export = {
-  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[], Subtask[], Note[], Position[]]> {
+  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[]]> {
     // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),
       request.get(tasks_url(lid, false), build_options(token)),
-      request.get(tasks_url(lid, true), build_options(token)),
-      request.get(subtasks_url(lid), build_options(token)),
-      request.get(notes_url(lid), build_options(token)),
-      request.get(subtask_positions_url(lid), build_options(token))
-    ]).then(combine_tasks).then(process_items)
+      request.get(tasks_url(lid, true), build_options(token))
+    ]).then(combine_tasks)//.then(process_items)
   },
   fetch_lists: (token) => {
     return request.get(lists_url(), build_options(token))

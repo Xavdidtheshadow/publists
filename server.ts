@@ -14,6 +14,17 @@ function title_maker (s:string) {
   return `${s} - Publists`
 }
 
+// function check_if_list_public (lid: number): Promise<ListInfo> {
+//   return User.findOne({ wid: lid }).then((user:User):ListInfo => {
+//     user.public_lists[0].public
+//     // return {
+
+//     //   public: user.public_lists[lid] || false,
+//     //   username: user.name
+//     // }
+//   })
+// }
+
 // ROUTES
 app.get('/', (req, res) => {
   res.render('index', {
@@ -139,6 +150,7 @@ app.get('/user/:wid/lists', (req, res) => {
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
   let u
+  // check_if_list_public(3)
   User.findOne({wid: req.params.wid}).then((user):Promise<any> => {
     if (user.public_lists[req.params.lid] === true) {
       // console.log('yeppin')
@@ -147,7 +159,7 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
     } else {
       return Promise.reject({code: 404})
     }
-  }).then((results:[List, Task[], Subtask[], Note[], Position[]]) => {
+  }).then((results:[List, Task[]]) => {
     res.render('list', {
       user: u,
       list: results[0],
@@ -179,6 +191,10 @@ app.get('/api/lists', (req, res) => {
       res.send(err)
     })
   }
+})
+
+app.get('/api/tasks', (req, res) => {
+  // check if list is public
 })
 
 app.use((err, req, res, next) => {
