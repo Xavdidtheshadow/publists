@@ -139,6 +139,7 @@ app.get('/user/:wid/lists', (req, res) => {
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
   let u
+  // check_if_list_public(3)
   User.findOne({wid: req.params.wid}).then((user):Promise<any> => {
     if (user.public_lists[req.params.lid] === true) {
       // console.log('yeppin')
@@ -147,7 +148,7 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
     } else {
       return Promise.reject({code: 404})
     }
-  }).then((results:[List, Task[], Subtask[], Note[], Position[]]) => {
+  }).then((results:[List, Task[]]) => {
     res.render('list', {
       user: u,
       list: results[0],
@@ -179,6 +180,36 @@ app.get('/api/lists', (req, res) => {
       res.send(err)
     })
   }
+})
+
+app.get('/api/tasks', (req, res) => {
+  let u
+  // check_if_list_public(3)
+  // console.log('params!', req.query)
+  User.findOne({ wid: req.query.wid }).then((user): Promise<any> => {
+    // console.log('UUU', user)
+    if (user.public_lists[req.query.lid] === true) {
+      // console.log('yeppin')
+      u = user
+      return wunderlist.fetch_tasks_with_items(req.query.lid, user.access_token)
+    } else {
+      return Promise.reject({ code: 404 })
+    }
+  }).then((results: [List, Task[]]) => {
+    console.log('second promise')
+    res.json({
+      list: results[0],
+      tasks: results[1],
+      title: title_maker(results[0].title)
+    })
+  }).catch((err) => {
+    if (err.code === 404) {
+      res.status(404).send('list not found or not public')
+    } else {
+      console.log(err)
+      res.status(500).send({ error: err.toString() })
+    }
+  })
 })
 
 app.use((err, req, res, next) => {

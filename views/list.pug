@@ -7,34 +7,20 @@ block content
         = user.name
       |  &gt; 
     = list.title
-
-  p.
-    This is the current state of the list. Click a task for more info.
-
-  if tasks.length > 0
-    .box
+    
+  .ng-cloak(ng-controller='TasksController')
+    p
+      span(ng-show='loading').
+        Loading...
+      span(ng-hide='loading').
+        This is the current state of the list. Click a task for more info.
+        
+    .box(ng-if='model.tasks.length > 0')
       ul
-        each task in tasks
-          li
-            if task.completed
-              span.glyphicon.glyphicon-check
-            else
-              span.glyphicon.glyphicon-unchecked
+        li(ng-repeat='task in model.tasks' ng-href='/')
+          span.glyphicon.glyphicon-check(ng-if='task.completed')
+          span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
 
-            if task.note
-              span.balloon(data-toggle="tooltip" data-placement="right" title=task.note)
-                = task.title
-            else
-              = task.title
-          ul
-            each subtask in task.subtasks
-              li.subtask
-                if subtask.completed
-                  span.glyphicon.glyphicon-check
-                else
-                  span.glyphicon.glyphicon-unchecked
-                    
-                = subtask.title
-  else
-    p.
-      This list is empty!
+          span(tooltip-enable='task.note' ng-class='task.note ? "balloon" : ""' uib-tooltip="{{task.note}}" tooltip-placement='right').
+            {{ task.title }} 
+
