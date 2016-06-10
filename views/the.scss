@@ -68,10 +68,10 @@ body {
 
       li {
         // color: $dark_blue;
-        padding: 10px;
         margin: 4px;
         background-color: $white;
         border-radius: 5px;
+        padding: 10px;
 
         border: 1px solid $dark_grey;
 
@@ -90,9 +90,22 @@ body {
 
       .clickable {
         cursor: pointer;
+        padding: 0;
+
         &:hover {
           background-color: $grey;
         }
+
+        a {
+          display: block;
+          color: $dark_blue;
+          text-decoration: none;
+          padding: 10px;
+        }
+      }
+
+      .fat {
+        padding: 10px;
       }
 
       .subtask {

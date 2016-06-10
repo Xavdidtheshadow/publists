@@ -8,7 +8,7 @@ block content
         |  &gt; 
       | Settings
 
-    .ng-cloak(ng-controller='ListsController')
+    .ng-cloak(ng-controller='SettingsController')
       p
         span(ng-show='loading').
           Loading...
@@ -18,7 +18,7 @@ block content
           {{ model | json }}
       .box
         ul
-          li.clickable(ng-repeat='list in model.lists' ng-click='toggle(list)')
+          li.clickable.fat(ng-repeat='list in model.lists' ng-click='toggle(list)')
             input(type='checkbox' ng-model='model.public_lists[list.id]')
             | {{ list.title }}
 

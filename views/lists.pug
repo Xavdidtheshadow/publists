@@ -1,18 +1,24 @@
 extends ./layout.pug
 
 block content  
-  h2
-    small
-      = name
-      |  &gt; 
-    | Lists
+  .ng-cloak(ng-controller='ListsController')
+    p
+      span(ng-show='loading').
+        Loading lists...
 
-  if lists.length > 0
-    .box
+    h2(ng-show='!loading')
+      small.
+        {{ model.statics.name }} &gt; 
+      | Lists
+        
+    .box(ng-if='model.lists.length > 0')
+      p.
+        These are {{ model.statics.name }}'s public lists. Click one to see its tasks!
       ul
-        each list in lists
-          li.clickable(onclick=`location.href="/user/${wid}/lists/${list.id}"`)
-            = list.title
-  else
-    p.
+        li.clickable(ng-repeat='list in model.lists')
+          a(ng-href='/user/{{model.wid}}/lists/{{list.id}}')
+            span.
+              {{ list.title }}
+
+    p(ng-if='!loading && model.lists.length === 0').
       This user has no public lists

@@ -14,6 +14,12 @@ function title_maker (s:string) {
   return `${s} - Publists`
 }
 
+function check_if_list_public (wid, lid):Promise<boolean> {
+  return User.findOne({ wid: wid }).then((user:User) => {
+    return user.public_lists[lid] || false
+  })
+}
+
 // ROUTES
 app.get('/', (req, res) => {
   res.render('index', {
@@ -47,6 +53,33 @@ app.get('/login', (req, res) => {
   }
 })
 
+app.get('/callback', (req, res) => {
+  let code: string = req.query.code
+  // console.log(code)
+  if (req.query.state === process.env.STATE) {
+    // console.log('in callback inner!')
+    wunderlist.getAuthedUser(code).then((results) => {
+      // console.log('posted for access', results)
+      return User.login(results[0].access_token, results[1].id, results[1].name)
+    }).then((user: User) => {
+      req.session.user = user
+      res.redirect('/')
+    }).catch((err) => {
+      // this could be a mongo or wunderlist error
+      console.log('err', err)
+      res.status(500).send({ status: err.code, message: err.message })
+    })
+  } else if (!app.get('production')) {
+    User.login_locally().then((user: User) => {
+      req.session.user = user
+      res.redirect('/')
+    })
+  } else {
+    console.log('bad user?')
+    res.sendStatus(500)
+  }
+})
+
 app.get('/logout', (req, res) => {
   req.session.user = undefined
   res.redirect('/')
@@ -61,33 +94,7 @@ app.get('/profile', (req, res) => {
   }
 })
 
-app.get('/callback', (req, res) => {
-  let code:string = req.query.code
-  // console.log(code)
-  if (req.query.state === process.env.STATE) {
-    // console.log('in callback inner!')
-    wunderlist.getAuthedUser(code).then((results) => {
-      // console.log('posted for access', results)
-      return User.login(results[0].access_token, results[1].id, results[1].name)
-    }).then((user:User) => {
-      req.session.user = user
-      res.redirect('/')
-    }).catch((err) => {
-      // this could be a mongo or wunderlist error
-      console.log('err', err)
-      res.status(500).send({status: err.code, message: err.message})
-    })
-  } else if (!app.get('production')) {
-    User.login_locally().then((user: User) => {
-      req.session.user = user
-      res.redirect('/')
-    })
-  } else {
-    console.log('bad user?')
-    res.sendStatus(500)
-  }
-})
-
+// update saved lists
 app.post('/update', (req, res) => {
   if (!req.session.user) {
     res.status(401).send({message: 'No session exists'})
@@ -111,22 +118,11 @@ app.post('/update', (req, res) => {
   }
 })
 
+// RENDERERS
 app.get('/user/:wid/lists', (req, res) => {
-  User.findOne({wid: req.params.wid}).then((user) => {
-    // console.log(user)
-    // only need the promise array because i'm houisting the variable
-    return Promise.all([user, wunderlist.fetch_lists(user.access_token)])
-  }).then((results) => {
-    // [user, lists]
-    let public_lists = results[1].filter((list) => {
-      return results[0].public_lists[list.id]
-    })
-
+  User.findOne({wid: req.params.wid}).then((user:User) => {
     res.render('lists', {
-      wid: req.params.wid,
-      lists: public_lists,
-      name: results[0].name,
-      title: title_maker(`${results[0].name}'s lists`)
+      name: user.name
     })
   }).catch((err) => {
     if (err.statusCode === 404) {
@@ -138,35 +134,22 @@ app.get('/user/:wid/lists', (req, res) => {
 })
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
-  let u
-  // check_if_list_public(3)
-  User.findOne({wid: req.params.wid}).then((user):Promise<any> => {
+  User.findOne({wid: req.params.wid}).then((user) => {
     if (user.public_lists[req.params.lid] === true) {
-      // console.log('yeppin')
-      u = user
-      return wunderlist.fetch_tasks_with_items(req.params.lid, user.access_token)
+      res.render('list', {
+        user: user
+      })
     } else {
-      return Promise.reject({code: 404})
-    }
-  }).then((results:[List, Task[]]) => {
-    res.render('list', {
-      user: u,
-      list: results[0],
-      tasks: results[1],
-      title: title_maker(results[0].title)
-    })
-  }).catch((err) => {
-    if (err.code === 404) {
       res.status(404).send('list not found or not public')
-    } else {
-      console.log(err)
-      res.status(500).send({error: err.toString()})
     }
+  }).catch((err) => {
+    console.log(err)
+    res.status(500).send({error: err.toString()})
   })
 })
 
+// API
 app.get('/api/lists', (req, res) => {
-  // console.log('pre', req.session.user)
   if (!req.session.user) {
     res.status(401).send('Unauthenticated')
   } else {
@@ -182,25 +165,43 @@ app.get('/api/lists', (req, res) => {
   }
 })
 
+app.get('/api/public_lists', (req, res) => {
+  User.findOne({ wid: req.query.wid }).then((user) => {
+    // console.log(user)
+    // only need the promise array because i'm houisting the variable
+    return Promise.all([user, wunderlist.fetch_lists(user.access_token)])
+  }).then((results: [User, List[]]) => {
+    let public_lists = results[1].filter((list) => {
+      return results[0].public_lists[list.id]
+    })
+
+    res.json({
+      // wid: req.params.wid,
+      lists: public_lists,
+      name: results[0].name
+      // title: title_maker(`${results[0].name}'s lists`)
+    })
+  }).catch((err) => {
+    if (err.statusCode === 404) {
+      res.status(404).send('list not found or not public')
+    } else {
+      res.status(500).send({ error: err.toString() })
+    }
+  })
+})
+
 app.get('/api/tasks', (req, res) => {
-  let u
-  // check_if_list_public(3)
-  // console.log('params!', req.query)
   User.findOne({ wid: req.query.wid }).then((user): Promise<any> => {
-    // console.log('UUU', user)
     if (user.public_lists[req.query.lid] === true) {
-      // console.log('yeppin')
-      u = user
       return wunderlist.fetch_tasks_with_items(req.query.lid, user.access_token)
     } else {
       return Promise.reject({ code: 404 })
     }
   }).then((results: [List, Task[]]) => {
-    console.log('second promise')
+    // console.log('second promise')
     res.json({
       list: results[0],
-      tasks: results[1],
-      title: title_maker(results[0].title)
+      tasks: results[1]
     })
   }).catch((err) => {
     if (err.code === 404) {
@@ -212,6 +213,7 @@ app.get('/api/tasks', (req, res) => {
   })
 })
 
+// express stuff
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send(err)

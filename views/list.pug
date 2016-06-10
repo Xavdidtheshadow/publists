@@ -1,26 +1,24 @@
 extends ./layout.pug
 
-block content
-  h2
-    small
-      a(href=`/user/${user.wid}/lists`)
-        = user.name
-      |  &gt; 
-    = list.title
-    
+block content  
   .ng-cloak(ng-controller='TasksController')
+    h2
+      small
+        a(href=`/user/${user.wid}/lists`)
+          = user.name
+        |  &gt; 
+      span(ng-bind='loading ? "Loading..." : model.list.title' )
+
     p
-      span(ng-show='loading').
-        Loading...
       span(ng-hide='loading').
         This is the current state of the list. Click a task for more info.
-        
+
     .box(ng-if='model.tasks.length > 0')
       ul
-        li(ng-repeat='task in model.tasks' ng-href='/')
-          span.glyphicon.glyphicon-check(ng-if='task.completed')
-          span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
+        li.clickable(ng-repeat='task in model.tasks')
+          a(ng-href='/user/{{model.wid}}/lists/{{model.lid}}/task/{{task.id}}')
+            span.glyphicon.glyphicon-check(ng-if='task.completed')
+            span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
 
-          span(tooltip-enable='task.note' ng-class='task.note ? "balloon" : ""' uib-tooltip="{{task.note}}" tooltip-placement='right').
-            {{ task.title }} 
-
+            span(tooltip-enable='task.note' ng-class='task.note ? "balloon" : ""' uib-tooltip="{{task.note}}" tooltip-placement='right').
+              {{ task.title }} 
