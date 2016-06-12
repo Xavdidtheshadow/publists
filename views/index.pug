@@ -2,6 +2,7 @@ extends ./layout.pug
 
 block content
   if logged_in
+    //- this goes outside the angular because they're already logged in to fetch
     h2
       small
         = name || 'User'
@@ -32,8 +33,8 @@ block content
 
   else
     h2 Public Lists
-    p
-      | The best part of making lists is being able to track items you need to remember. The second best part is being able to share those lists with other people. Mysteriously, Wunderlist pulled their public list feature, so we recreated it. 
+    p.
+      The best part of making lists is being able to track items you need to remember. The second best part is being able to share those lists with other people. Mysteriously, Wunderlist pulled their public list feature, so we recreated it.
     p.
       Authenticate with wunderlist to get started!
     a.btn.btn-default.btn-lg(href='/login').

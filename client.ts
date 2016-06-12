@@ -5,6 +5,16 @@ var ui = require('angular-ui-bootstrap')
 
 var app = angular.module('publists', [ui])
 
+app.service('subtaskFunctions', function() {
+  return {
+    subtaskPercentage: function(subtasks: Subtask[]):number {
+      return subtasks.filter(function(val) {
+        return val.completed === true
+      }).length / subtasks.length * 100
+    }
+  }
+})
+
 app.controller('SettingsController', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
   $scope.init = function () {
     $scope.model = {}
@@ -45,10 +55,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
   $scope.init = function() {
     $scope.loading = true
     $scope.model = { 
-      lists: [],
-      statics: {
-        name: ''
-      }
+      lists: []
     }
 
     var urlParts = location.href.split('/')
@@ -63,7 +70,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
       }
     }) {
       $scope.model.lists = res.data.lists
-      $scope.model.statics.name = res.data.name
+      // $scope.model.statics.name = res.data.name
       $scope.loading = false
     })
   }
@@ -71,7 +78,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
   $scope.init()
 }])
 
-app.controller('TasksController', ['$scope', '$http', function($scope, $http) {
+app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', function($scope, $http, subtaskFunctions) {
   $scope.init = function():void {
     $scope.loading = true
     $scope.model = { tasks: [] }
@@ -95,5 +102,6 @@ app.controller('TasksController', ['$scope', '$http', function($scope, $http) {
     })
   }
 
+  $scope.subtaskPercentage = subtaskFunctions.subtaskPercentage
   $scope.init()
 }])

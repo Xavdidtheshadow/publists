@@ -17,6 +17,9 @@ block content
       ul
         li.clickable(ng-repeat='task in model.tasks')
           a(ng-href='/user/{{model.wid}}/lists/{{model.lid}}/task/{{task.id}}')
+            .progress(ng-if='task.subtasks.length > 0')
+              .progress-bar(role='progressbar', style='width: {{ subtaskPercentage(task.subtasks) }}%;')
+
             span.glyphicon.glyphicon-check(ng-if='task.completed')
             span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
 

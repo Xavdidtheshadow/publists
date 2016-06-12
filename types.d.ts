@@ -7,6 +7,7 @@ interface Task {
   list_id: number,
   starred: boolean,
   title: string,
+  completed: boolean,
   // I add these manually later during condensation
   subtasks?: Subtask[],
   note?: string
@@ -28,7 +29,8 @@ interface Subtask {
   id: number,
   created_at: string, // this is a datetime string, really
   task_id: number,
-  title: string
+  title: string,
+  completed: boolean
 }
 
 interface Note {

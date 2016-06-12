@@ -1,19 +1,22 @@
 extends ./layout.pug
 
-block content  
+block content
+  h2(ng-show='!loading')
+    small
+      = name
+      |  &gt;
+    | Lists
+
   .ng-cloak(ng-controller='ListsController')
     p
       span(ng-show='loading').
-        Loading lists...
-
-    h2(ng-show='!loading')
-      small.
-        {{ model.statics.name }} &gt; 
-      | Lists
+        Loading...
         
     .box(ng-if='model.lists.length > 0')
-      p.
-        These are {{ model.statics.name }}'s public lists. Click one to see its tasks!
+      p
+        | These are
+        = name
+        | 's public lists. Click one to see its tasks!
       ul
         li.clickable(ng-repeat='list in model.lists')
           a(ng-href='/user/{{model.wid}}/lists/{{list.id}}')

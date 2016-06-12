@@ -47,11 +47,12 @@ function build_options (access_token:string) {
   }, options)
 }
 
+// return an array of subtasks in their position order
 function order_subtasks (subtasks:Subtask[], pos:Position) {
   if (pos.values.length === 0) {
     return _.sortBy(subtasks, 'created_at')
   } else {
-    let res:Subtask[] = []
+    let res: Subtask[] = []
     let indexed_tasks = _.groupBy(subtasks, 'id')
     pos.values.forEach((val) => {
       // subtask might not exist
@@ -67,6 +68,7 @@ function order_subtasks (subtasks:Subtask[], pos:Position) {
   }
 }
 
+// adds ordered subtasks and notes to tasks
 function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
   let subtasks = _.groupBy(data[2], 'task_id')
   let notes = _.groupBy(data[3], 'task_id')
@@ -80,7 +82,7 @@ function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
     }
     data[1][index].note = notes[task.id] ? notes[task.id][0].content : undefined
   })
-  return data
+  return [data[0], data[1]]
 }
 
 function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]]) {
@@ -89,7 +91,7 @@ function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]
 }
 
 export = {
-  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[], Subtask[], Note[], Position[]]> {
+  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[]]> {
     // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),

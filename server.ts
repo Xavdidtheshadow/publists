@@ -24,12 +24,14 @@ function check_if_list_public (wid, lid):Promise<boolean> {
 app.get('/', (req, res) => {
   res.render('index', {
     title: title_maker('Index'),
-    name: req.session.user ? req.session.user.name : ''
+    name: req.session.user ? req.session.user.name : null
   })
 })
 
 app.get('/faq', (req, res) => {
-  res.render('faq', {title: title_maker('FAQs')})
+  res.render('faq', {
+    title: title_maker('FAQs')
+  })
 })
 
 app.get('/login', (req, res) => {
@@ -119,8 +121,10 @@ app.post('/update', (req, res) => {
 })
 
 // RENDERERS
+// these all fetch the user even though the client does too
+// it looks nicer, it's fine
 app.get('/user/:wid/lists', (req, res) => {
-  User.findOne({wid: req.params.wid}).then((user:User) => {
+  User.findOne({wid: req.params.wid}).then((user: User) => {
     res.render('lists', {
       name: user.name
     })
@@ -134,7 +138,7 @@ app.get('/user/:wid/lists', (req, res) => {
 })
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
-  User.findOne({wid: req.params.wid}).then((user) => {
+  User.findOne({wid: req.params.wid}).then((user: User) => {
     if (user.public_lists[req.params.lid] === true) {
       res.render('list', {
         user: user
@@ -154,7 +158,7 @@ app.get('/api/lists', (req, res) => {
     res.status(401).send('Unauthenticated')
   } else {
     wunderlist.fetch_lists(req.session.user.access_token).then((lists) => {
-      res.send({
+      res.json({
         lists: lists,
         public_lists: req.session.user.public_lists
       })
@@ -197,7 +201,7 @@ app.get('/api/tasks', (req, res) => {
     } else {
       return Promise.reject({ code: 404 })
     }
-  }).then((results: [List, Task[]]) => {
+  }).then((results: [List, Task[], Subtask[], Note[], Position[]]) => {
     // console.log('second promise')
     res.json({
       list: results[0],
