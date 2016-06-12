@@ -4,6 +4,8 @@ import request = require('request-promise')
 import _ = require('lodash')
 
 const base_url = 'https://a.wunderlist.com/api/v1'
+const url_regex = /https?:\/\/[\w\.\/\&\?@=#-\d]*/
+const url_replacement = '[link removed]'
 
 // makes sure the auth is there
 const options = {
@@ -73,6 +75,7 @@ function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
   let subtasks = _.groupBy(data[2], 'task_id')
   let notes = _.groupBy(data[3], 'task_id')
   let orders = _.groupBy(data[4], 'task_id')
+
   data[1].forEach((task, index) => {
     // there's no reason that orders wouldn't be there, but you never know
     if (subtasks[task.id] && orders[task.id]) {
@@ -80,8 +83,14 @@ function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
     } else {
       data[1][index].subtasks = []
     }
-    data[1][index].note = notes[task.id] ? notes[task.id][0].content : undefined
+    if (notes[task.id]) {
+      let note = notes[task.id][0].content.replace(url_regex, url_replacement)
+      data[1][index].note = note  
+    } else {
+      data[1][index].note = undefined
+    }
   })
+
   return [data[0], data[1]]
 }
 
