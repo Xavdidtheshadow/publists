@@ -1,9 +1,12 @@
 'use strict'
 
 import angular = require('angular')
-var ui = require('angular-ui-bootstrap')
+// var ui = require('angular-ui-bootstrap')
 
-var app = angular.module('publists', [ui])
+var app = angular.module('publists', [
+  require('angular-ui-bootstrap'), 
+  require('angular-sanitize')
+ ])
 
 app.service('subtaskFunctions', function() {
   return {
@@ -99,6 +102,32 @@ app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', functi
       $scope.model.tasks = res.data.tasks || []
       // console.log(res.data.list)
       $scope.model.list = res.data.list
+    })
+  }
+
+  $scope.subtaskPercentage = subtaskFunctions.subtaskPercentage
+  $scope.init()
+}])
+
+app.controller('TaskController', ['$scope', '$http', 'subtaskFunctions', function($scope, $http, subtaskFunctions) {
+  $scope.init = function(): void {
+    $scope.loading = true
+    $scope.model = { tasks: [] }
+
+    var urlParts = location.href.split('/')
+    $scope.model.wid = urlParts[4]
+    $scope.model.lid = urlParts[6]
+    $scope.model.tid = urlParts[8]
+
+    $http.get('/api/task_info', {
+      params: { wid: $scope.model.wid, lid: $scope.model.lid, tid: $scope.model.tid }
+    }).then(function(res: {
+      data: {
+        task: Task
+      }
+    }) {
+      $scope.loading = false
+      $scope.model.task = res.data.task
     })
   }
 

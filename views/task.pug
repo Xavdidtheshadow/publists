@@ -1,0 +1,30 @@
+extends ./layout.pug
+
+block content
+  .ng-cloak(ng-controller='TaskController')
+    h2
+      small
+        a(href=`/user/${user.wid}/lists`)
+          = user.name
+        |  &gt; 
+        a(href=`/user/${user.wid}/lists/${list}`)
+          = list.title
+        |  &gt; 
+      span(ng-bind='loading ? "Loading..." : model.task.title' )
+
+    
+    p(ng-show='model.task.note')
+      | Note: 
+      span(ng-bind-html='model.task.note | linky')
+
+    .box(ng-if='model.task.subtasks.length > 0')
+      p.
+        Subtasks: 
+      ul
+        li(ng-repeat='task in model.task.subtasks')
+          span.glyphicon.glyphicon-check(ng-if='task.completed')
+          span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
+
+          | {{ task.title }} 
+
+      

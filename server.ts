@@ -152,6 +152,24 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
   })
 })
 
+app.get('/user/:wid/lists/:lid/task/:tid', (req, res) => {
+  User.findOne({ wid: req.params.wid }).then((user: User) => {
+    if (user.public_lists[req.params.lid] === true) {
+      return Promise.all([user, wunderlist.fetch_list(req.params.lid, user.access_token)])
+    } else {
+      res.status(404).send('list not found or not public')
+    }
+  }).then((results: [User, List]) => {
+    res.render('task', {
+      user: results[0],
+      list: results[1]
+    })
+  }).catch((err) => {
+    console.log(err)
+    res.status(500).send({ error: err.toString() })
+  })
+})
+
 // API
 app.get('/api/lists', (req, res) => {
   if (!req.session.user) {
@@ -169,6 +187,7 @@ app.get('/api/lists', (req, res) => {
   }
 })
 
+// fetch public lists for a user
 app.get('/api/public_lists', (req, res) => {
   User.findOne({ wid: req.query.wid }).then((user) => {
     // console.log(user)
@@ -194,6 +213,7 @@ app.get('/api/public_lists', (req, res) => {
   })
 })
 
+// fetch info for a task
 app.get('/api/tasks', (req, res) => {
   User.findOne({ wid: req.query.wid }).then((user): Promise<any> => {
     if (user.public_lists[req.query.lid] === true) {
@@ -206,6 +226,29 @@ app.get('/api/tasks', (req, res) => {
     res.json({
       list: results[0],
       tasks: results[1]
+    })
+  }).catch((err) => {
+    if (err.code === 404) {
+      res.status(404).send('list not found or not public')
+    } else {
+      console.log(err)
+      res.status(500).send({ error: err.toString() })
+    }
+  })
+})
+
+// fetch info for a task
+app.get('/api/task_info', (req, res) => {
+  User.findOne({ wid: req.query.wid }).then((user): Promise<any> => {
+    if (user.public_lists[req.query.lid] === true) {
+      return wunderlist.fetch_task_with_info(req.query.tid, user.access_token)
+    } else {
+      return Promise.reject({ code: 404 })
+    }
+  }).then((result: Task) => {
+    // console.log('second promise')
+    res.json({
+      task: result
     })
   }).catch((err) => {
     if (err.code === 404) {

@@ -6,6 +6,7 @@ import _ = require('lodash')
 const base_url = 'https://a.wunderlist.com/api/v1'
 const url_regex = /https?:\/\/[\w\.\/\&\?@=#-\d]*/
 const url_replacement = '[link removed]'
+type fetch_by = 'task' | 'list'
 
 // makes sure the auth is there
 const options = {
@@ -17,20 +18,24 @@ const options = {
   }
 }
 
-function tasks_url (lid, completed) {
+function tasks_url (lid:string, completed:boolean) {
   return `${base_url}/tasks?list_id=${lid}&completed=${completed}`
 }
 
-function subtasks_url (lid) {
-  return `${base_url}/subtasks?list_id=${lid}`
+function task_url (tid: string) {
+  return `${base_url}/tasks/${tid}`
 }
 
-function subtask_positions_url (lid) {
-  return `${base_url}/subtask_positions?list_id=${lid}`
+function subtasks_url (fetch_type:fetch_by, id:string) {
+  return `${base_url}/subtasks?${fetch_type}_id=${id}`
 }
 
-function notes_url (lid) {
-  return `${base_url}/notes?list_id=${lid}`
+function subtask_positions_url (fetch_type:fetch_by, id:string) {
+  return `${base_url}/subtask_positions?${fetch_type}_id=${id}`
+}
+
+function notes_url (fetch_type:fetch_by, id:string) {
+  return `${base_url}/notes?${fetch_type}_id=${id}`
 }
 
 function lists_url () {
@@ -94,31 +99,48 @@ function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
   return [data[0], data[1]]
 }
 
+function process_task(data:[Task, Subtask[], Note[], Position[]]) {
+  let task = data[0]
+  task.subtasks = order_subtasks(data[1], data[3][0])
+  if (data[2].length > 0) {
+    task.note = data[2][0].content  
+  }
+  return task
+}
+
 function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]]) {
   let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
   return [data[0], sorted, data[3], data[4], data[5]]
 }
 
 export = {
-  fetch_tasks_with_items: function(lid, token):Promise<[List, Task[]]> {
+  fetch_tasks_with_items: function(lid:string, token:string) {
     // these objects are pretty spread
     return Promise.all([
       this.fetch_list(lid, token),
       request.get(tasks_url(lid, false), build_options(token)),
       request.get(tasks_url(lid, true), build_options(token)),
-      request.get(subtasks_url(lid), build_options(token)),
-      request.get(notes_url(lid), build_options(token)),
-      request.get(subtask_positions_url(lid), build_options(token))
+      request.get(subtasks_url('list', lid), build_options(token)),
+      request.get(notes_url('list', lid), build_options(token)),
+      request.get(subtask_positions_url('list', lid), build_options(token))
     ]).then(combine_tasks).then(process_items)
   },
-  fetch_lists: (token) => {
+  fetch_lists: (token:string) => {
     return request.get(lists_url(), build_options(token))
   },
-  fetch_list: (lid, token) => {
+  fetch_list: (lid:string, token:string) => {
     return request.get(`${lists_url()}/${lid}`, build_options(token))
   },
-  fetch_user: (token) => {
+  fetch_user: (token:string) => {
     return request.get(user_url(), build_options(token))
+  },
+  fetch_task_with_info: (tid:string, token:string) => {
+    return Promise.all([
+      request.get(task_url(tid), build_options(token)),
+      request.get(subtasks_url('task', tid), build_options(token)),
+      request.get(notes_url('task', tid), build_options(token)),
+      request.get(subtask_positions_url('task', tid), build_options(token))
+    ]).then(process_task)
   },
   auth: (code) => {
     let opts = {
