@@ -6,8 +6,8 @@ block content
     h2
       small
         = name || 'User'
-        |  &gt; 
-      | Settings
+        |  &gt;
+      |  Settings
 
     .ng-cloak(ng-controller='SettingsController')
       p
@@ -23,7 +23,7 @@ block content
             input(type='checkbox' ng-model='model.public_lists[list.id]')
             | {{ list.title }}
 
-          //- should this page link to the list at all? 
+          //- should this page link to the list at all?
           //- a(ng-href=`/user/${wid}/lists/{{list.id}}` target='_blank')
           //-   span(class='glyphicon glyphicon-link')
 
@@ -39,4 +39,4 @@ block content
       Authenticate with wunderlist to get started!
     a.btn.btn-default.btn-lg(href='/login').
       Authenticate
-      
+

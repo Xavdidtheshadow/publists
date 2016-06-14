@@ -6,25 +6,36 @@ block content
       small
         a(href=`/user/${user.wid}/lists`)
           = user.name
-        |  &gt; 
-        a(href=`/user/${user.wid}/lists/${list}`)
-          = list.title
-        |  &gt; 
-      span(ng-bind='loading ? "Loading..." : model.task.title' )
+        |  &gt;
+        a(href=`/user/${user.wid}/lists/${list.id}`)
+          = ' ' + list.title
+        |  &gt;
+      | Task
 
-    
-    p(ng-show='model.task.note')
-      | Note: 
-      span(ng-bind-html='model.task.note | linky')
+    .well.well-sm.box
+      h1
+        span(ng-bind='loading ? "Loading..." : model.task.title' )
 
-    .box(ng-if='model.task.subtasks.length > 0')
-      p.
-        Subtasks: 
-      ul
-        li(ng-repeat='task in model.task.subtasks')
-          span.glyphicon.glyphicon-check(ng-if='task.completed')
-          span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
+      h3.icons(ng-if='!loading')
+        span.glyphicon.glyphicon-check(ng-if='model.task.completed')
+        span.glyphicon.glyphicon-unchecked(ng-if='!model.task.completed')
 
-          | {{ task.title }} 
+        span.glyphicon.glyphicon-star(ng-if='model.task.starred')
+        span.glyphicon.glyphicon-star-empty(ng-if='!model.task.starred')
 
-      
+      p(ng-show='model.task.note')
+        strong.
+          Note:
+        br
+        span.subtask(ng-bind-html='model.task.note | linky')
+
+      .subtasks(ng-if='model.task.subtasks.length > 0')
+        p
+          strong.
+            Subtasks:
+        ul
+          li.subtask(ng-repeat='task in model.task.subtasks')
+            span.glyphicon.glyphicon-check(ng-if='task.completed')
+            span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')
+
+            | {{ task.title }}

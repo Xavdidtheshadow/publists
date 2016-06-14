@@ -5,13 +5,13 @@ block content
     small
       = name
       |  &gt;
-    | Lists
+    |  Lists
 
   .ng-cloak(ng-controller='ListsController')
     p
       span(ng-show='loading').
         Loading...
-        
+
     .box(ng-if='model.lists.length > 0')
       p
         | These are

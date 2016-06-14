@@ -56,9 +56,41 @@ body {
 
   .mid {
     padding-bottom: $footer_height;
+
+    .well {
+      padding-left: 25px;
+    }
+
     .box {
       @include tablet {
         width: 40%;
+      }
+
+      h1, h3 {
+        text-align: center;
+        margin-top: 0px;
+      }
+
+      .icons {
+        display: flex;
+
+        .glyphicon {
+          margin-right: 10px;
+          flex: 1;
+          // text-align: center;
+          // vertical-align: middle;
+        }
+
+        .glyphicon-star {
+          // color: white;
+          // background-color: $maize;
+        }
+      }
+
+      p {
+        span {
+          padding-left: 25px;
+        }
       }
     }
 
