@@ -7,6 +7,7 @@ const base_url = 'https://a.wunderlist.com/api/v1'
 const url_regex = /https?:\/\/[\w\.\/\&\?@=#-\d]*/
 const url_replacement = '[link removed]'
 type fetch_by = 'task' | 'list'
+type fetch_level = 'task' | 'subtask'
 
 // makes sure the auth is there
 const options = {
@@ -30,8 +31,14 @@ function subtasks_url (fetch_type:fetch_by, id:string) {
   return `${base_url}/subtasks?${fetch_type}_id=${id}`
 }
 
-function subtask_positions_url (fetch_type:fetch_by, id:string) {
-  return `${base_url}/subtask_positions?${fetch_type}_id=${id}`
+function list_positions_url() {
+  return `${base_url}/list_positions`
+}
+
+// has to either pass 'task', 'list'
+// or, 'subtask', 'task'
+function task_positions_url (fetch_level:fetch_level, fetch_type:fetch_by, id:string) {
+  return `${base_url}/${fetch_level}_positions?${fetch_type}_id=${id}`
 }
 
 function notes_url (fetch_type:fetch_by, id:string) {
@@ -75,22 +82,41 @@ function order_subtasks (subtasks:Subtask[], pos:Position) {
   }
 }
 
+function order_lists (data: [List[], Position[]]) {
+  let order = data[1][0]
+
+  let res: List[] = []
+  let indexed_lists = _.groupBy(data[0], 'id')
+  order.values.forEach((val) => {
+    // subtask might not exist
+    if (indexed_lists[val]) {
+      res.push(indexed_lists[val][0])
+      // so that we know which ones are left
+      delete indexed_lists[val]
+    }
+  })
+  // add any remaining tasks
+  res.concat(_.sortBy(data[0], 'created_at'))
+  return res
+}
+
+function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[]]) {
+    let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
+    return [data[0], sorted, data[3], data[4], data[5]]
+}
+
 // adds ordered subtasks and notes to tasks
-function process_items (data:[List, Task[], Subtask[], Note[], Position[]]) {
+function process_items (data:[List, Task[], Subtask[], Note[]]) {
   let subtasks = _.groupBy(data[2], 'task_id')
   let notes = _.groupBy(data[3], 'task_id')
-  let orders = _.groupBy(data[4], 'task_id')
 
   data[1].forEach((task, index) => {
-    // there's no reason that orders wouldn't be there, but you never know
-    if (subtasks[task.id] && orders[task.id]) {
-      data[1][index].subtasks = order_subtasks(subtasks[task.id], orders[task.id][0])
-    } else {
-      data[1][index].subtasks = []
-    }
+    // when fetching all items, subtasks are unordered
+    data[1][index].subtasks = subtasks[task.id] || []
+
     if (notes[task.id]) {
       let note = notes[task.id][0].content.replace(url_regex, url_replacement)
-      data[1][index].note = note  
+      data[1][index].note = note
     } else {
       data[1][index].note = undefined
     }
@@ -103,14 +129,9 @@ function process_task(data:[Task, Subtask[], Note[], Position[]]) {
   let task = data[0]
   task.subtasks = order_subtasks(data[1], data[3][0])
   if (data[2].length > 0) {
-    task.note = data[2][0].content  
+    task.note = data[2][0].content
   }
   return task
-}
-
-function combine_tasks(data:[List, Task[], Task[], Subtask[], Note[], Position[]]) {
-  let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
-  return [data[0], sorted, data[3], data[4], data[5]]
 }
 
 export = {
@@ -121,12 +142,14 @@ export = {
       request.get(tasks_url(lid, false), build_options(token)),
       request.get(tasks_url(lid, true), build_options(token)),
       request.get(subtasks_url('list', lid), build_options(token)),
-      request.get(notes_url('list', lid), build_options(token)),
-      request.get(subtask_positions_url('list', lid), build_options(token))
+      request.get(notes_url('list', lid), build_options(token))
     ]).then(combine_tasks).then(process_items)
   },
   fetch_lists: (token:string) => {
-    return request.get(lists_url(), build_options(token))
+    return Promise.all([
+      request.get(lists_url(), build_options(token)),
+      request.get(list_positions_url(), build_options(token))
+    ]).then(order_lists)
   },
   fetch_list: (lid:string, token:string) => {
     return request.get(`${lists_url()}/${lid}`, build_options(token))
@@ -139,7 +162,7 @@ export = {
       request.get(task_url(tid), build_options(token)),
       request.get(subtasks_url('task', tid), build_options(token)),
       request.get(notes_url('task', tid), build_options(token)),
-      request.get(subtask_positions_url('task', tid), build_options(token))
+      request.get(task_positions_url('subtask', 'task', tid), build_options(token))
     ]).then(process_task)
   },
   auth: (code) => {

@@ -1,11 +1,13 @@
 'use strict'
 
 import angular = require('angular')
-// var ui = require('angular-ui-bootstrap')
+// this gets executed and put in global space
+require('angular-ui-indeterminate')
 
 var app = angular.module('publists', [
-  require('angular-ui-bootstrap'), 
-  require('angular-sanitize')
+  require('angular-ui-bootstrap'),
+  require('angular-sanitize'),
+  'ui.indeterminate'
  ])
 
 app.service('subtaskFunctions', function() {
@@ -22,7 +24,7 @@ app.controller('SettingsController', ['$scope', '$http', '$timeout', function($s
   $scope.init = function () {
     $scope.model = {}
     $scope.loading = true
-    $http.get('/api/lists').then(function(res: { data: { 
+    $http.get('/api/lists').then(function(res: { data: {
       lists: List[],
       public_lists: {[s:string]: boolean}
     }}) {
@@ -57,7 +59,7 @@ app.controller('SettingsController', ['$scope', '$http', '$timeout', function($s
 app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
   $scope.init = function() {
     $scope.loading = true
-    $scope.model = { 
+    $scope.model = {
       lists: []
     }
 
@@ -90,8 +92,8 @@ app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', functi
     $scope.model.wid = urlParts[4]
     $scope.model.lid = urlParts[6]
 
-    $http.get('/api/tasks', { 
-      params: { wid: $scope.model.wid, lid: $scope.model.lid } 
+    $http.get('/api/tasks', {
+      params: { wid: $scope.model.wid, lid: $scope.model.lid }
     }).then(function(res: {
       data: {
         list: List,

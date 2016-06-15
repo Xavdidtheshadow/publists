@@ -221,7 +221,7 @@ app.get('/api/tasks', (req, res) => {
     } else {
       return Promise.reject({ code: 404 })
     }
-  }).then((results: [List, Task[], Subtask[], Note[], Position[]]) => {
+  }).then((results: [List, Task[], Subtask[], Note[]]) => {
     // console.log('second promise')
     res.json({
       list: results[0],
