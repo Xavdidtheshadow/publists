@@ -8,6 +8,7 @@ const url_regex = /https?:\/\/[\w\.\/\&\?@=#-\d]*/
 const url_replacement = '[link removed]'
 type fetch_by = 'task' | 'list'
 type fetch_level = 'task' | 'subtask'
+type sortable = List[] | Task[] | Subtask[]
 
 // makes sure the auth is there
 const options = {
@@ -82,31 +83,34 @@ function order_subtasks (subtasks:Subtask[], pos:Position) {
   }
 }
 
-function order_lists (data: [List[], Position[]]) {
-  let order = data[1][0]
+function order_items_helper(items: sortable, order: Position) {
+  let res: sortable = []
 
-  let res: List[] = []
-  let indexed_lists = _.groupBy(data[0], 'id')
+  let indexed_items:{[s:string]: sortable} = _.groupBy(items, 'id')
   order.values.forEach((val) => {
-    // subtask might not exist
-    if (indexed_lists[val]) {
-      res.push(indexed_lists[val][0])
-      // so that we know which ones are left
-      delete indexed_lists[val]
-    }
+      // subtask might not exist
+      if (indexed_items[val]) {
+          res.push(indexed_items[val][0])
+          // so that we know which ones are left
+          delete indexed_items[val]
+      }
   })
   // add any remaining tasks
-  res.concat(_.sortBy(data[0], 'created_at'))
+  res.concat(<sortable> _.sortBy(_.values(indexed_items), 'created_at'))
   return res
 }
 
-function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[]]) {
+function order_items (data: [List[] | Task[] | Subtask[], Position[]]) {
+  return order_items_helper(data[0], data[1][0])
+}
+
+function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[], Position[]]) {
     let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
     return [data[0], sorted, data[3], data[4], data[5]]
 }
 
 // adds ordered subtasks and notes to tasks
-function process_items (data:[List, Task[], Subtask[], Note[]]) {
+function process_items (data:[List, Task[], Subtask[], Note[], Position[]]): [List, Task[]] {
   let subtasks = _.groupBy(data[2], 'task_id')
   let notes = _.groupBy(data[3], 'task_id')
 
@@ -122,7 +126,7 @@ function process_items (data:[List, Task[], Subtask[], Note[]]) {
     }
   })
 
-  return [data[0], data[1]]
+  return [data[0], <Task[]>order_items([data[1], data[4]])]
 }
 
 function process_task(data:[Task, Subtask[], Note[], Position[]]) {
@@ -142,14 +146,15 @@ export = {
       request.get(tasks_url(lid, false), build_options(token)),
       request.get(tasks_url(lid, true), build_options(token)),
       request.get(subtasks_url('list', lid), build_options(token)),
-      request.get(notes_url('list', lid), build_options(token))
+      request.get(notes_url('list', lid), build_options(token)),
+      request.get(task_positions_url('task', 'list', lid), build_options(token))
     ]).then(combine_tasks).then(process_items)
   },
   fetch_lists: (token:string) => {
     return Promise.all([
       request.get(lists_url(), build_options(token)),
       request.get(list_positions_url(), build_options(token))
-    ]).then(order_lists)
+    ]).then(order_items)
   },
   fetch_list: (lid:string, token:string) => {
     return request.get(`${lists_url()}/${lid}`, build_options(token))
