@@ -15,7 +15,7 @@ block content
     .box(ng-if='model.lists.length > 0')
       p
         | These are
-        = name
+        = ' ' + name
         | 's public lists. Click one to see its tasks!
       ul
         li.clickable(ng-repeat='list in model.lists')

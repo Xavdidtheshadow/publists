@@ -20,9 +20,9 @@ interface List {
 }
 
 interface Position {
-  id: number,
+  // id: number,
   values: number[],
-  type: 'list_position'|'task_position'
+  // type: 'list_position' | 'task_position'
 }
 
 interface Subtask {
@@ -44,4 +44,10 @@ interface User {
   access_token: string,
   name: string,
   public_lists: {[s:string]: boolean}
+}
+
+interface Folder {
+  id: number,
+  title: string,
+  list_ids: number[]
 }

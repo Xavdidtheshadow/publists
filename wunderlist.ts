@@ -50,6 +50,10 @@ function lists_url () {
   return `${base_url}/lists`
 }
 
+function folders_url () {
+  return `${base_url}/folders`
+}
+
 function user_url () {
   return `${base_url}/user`
 }
@@ -62,79 +66,51 @@ function build_options (access_token:string) {
   }, options)
 }
 
-// return an array of subtasks in their position order
-function order_subtasks (subtasks:Subtask[], pos:Position) {
-  if (pos.values.length === 0) {
-    return _.sortBy(subtasks, 'created_at')
-  } else {
-    let res: Subtask[] = []
-    let indexed_tasks = _.groupBy(subtasks, 'id')
-    pos.values.forEach((val) => {
-      // subtask might not exist
-      if (indexed_tasks[val]) {
-        res.push(indexed_tasks[val][0])
-        // so that we know which ones are left
-        delete indexed_tasks[val]
-      }
-    })
-    // add any remaining tasks
-    res.concat(_.sortBy(subtasks, 'created_at'))
+// order a set of items based on their position in the position array
+function order_items(items: sortable, order: Position) {
+  let res: sortable = []
+
+  if (!items) {
+    // console.log(`order items called with no items!`, items)
     return res
   }
-}
-
-function order_items_helper(items: sortable, order: Position) {
-  let res: sortable = []
 
   let indexed_items:{[s:string]: sortable} = _.groupBy(items, 'id')
   order.values.forEach((val) => {
-      // subtask might not exist
-      if (indexed_items[val]) {
-          res.push(indexed_items[val][0])
-          // so that we know which ones are left
-          delete indexed_items[val]
-      }
+    // subtask might not exist
+    if (indexed_items[val]) {
+      res.push(indexed_items[val][0])
+      // so that we know which ones are left
+      delete indexed_items[val]
+    }
   })
-  // add any remaining tasks
-  res.concat(<sortable> _.sortBy(_.values(indexed_items), 'created_at'))
+  // add any remaining tasks; there probably aren't any
+  res = res.concat(<sortable> _.sortBy(_.flatten(_.values(indexed_items)), 'created_at'))
   return res
 }
 
-function order_items (data: [List[] | Task[] | Subtask[], Position[]]) {
-  return order_items_helper(data[0], data[1][0])
-}
-
+// pretend we can get back all tasks (completed and not) with one call
 function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[], Position[]]) {
     let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
     return [data[0], sorted, data[3], data[4], data[5]]
 }
 
-// adds ordered subtasks and notes to tasks
-function process_items (data:[List, Task[], Subtask[], Note[], Position[]]): [List, Task[]] {
-  let subtasks = _.groupBy(data[2], 'task_id')
-  let notes = _.groupBy(data[3], 'task_id')
-
-  data[1].forEach((task, index) => {
-    // when fetching all items, subtasks are unordered
-    data[1][index].subtasks = subtasks[task.id] || []
-
-    if (notes[task.id]) {
-      let note = notes[task.id][0].content.replace(url_regex, url_replacement)
-      data[1][index].note = note
+function process_task(task: Task, subtasks: Subtask[], note: Note, position: Position, simple: boolean) {
+  // there might be a way to combine these blocks, but i'm not thinking of it
+  if (note) {
+    if (simple) {
+      task.note = note.content.replace(url_regex, url_replacement)
     } else {
-      data[1][index].note = undefined
+      task.note = note.content
     }
-  })
-
-  return [data[0], <Task[]>order_items([data[1], data[4]])]
-}
-
-function process_task(data:[Task, Subtask[], Note[], Position[]]) {
-  let task = data[0]
-  task.subtasks = order_subtasks(data[1], data[3][0])
-  if (data[2].length > 0) {
-    task.note = data[2][0].content
   }
+
+  if (simple) {
+    task.subtasks = subtasks
+  } else {
+    task.subtasks = <Subtask[]> order_items(subtasks, position)
+  }
+  // console.log(subtasks, task.subtasks)
   return task
 }
 
@@ -148,19 +124,36 @@ export = {
       request.get(subtasks_url('list', lid), build_options(token)),
       request.get(notes_url('list', lid), build_options(token)),
       request.get(task_positions_url('task', 'list', lid), build_options(token))
-    ]).then(combine_tasks).then(process_items)
+    ])
+    .then(combine_tasks)
+    .then((data: [List, Task[], Subtask[], Note[], Position[]]) => {
+      // adds ordered subtasks and notes to tasks
+      let subtasks = _.groupBy(data[2], 'task_id')
+      let notes = _.groupBy(data[3], 'task_id')
+      let fake_position = <Position> { values: [] }
+
+      data[1].forEach((task) => {
+        let note = notes[task.id] ? notes[task.id][0] : undefined
+        task = process_task(task, subtasks[task.id], note, fake_position, true)
+      })
+
+      return {
+        list: data[0],
+        tasks: <Task[]> order_items(data[1], data[4][0])
+      }
+    })
   },
   fetch_lists: (token:string) => {
     return Promise.all([
       request.get(lists_url(), build_options(token)),
-      request.get(list_positions_url(), build_options(token))
-    ]).then(order_items)
+      request.get(list_positions_url(), build_options(token)),
+      request.get(folders_url(), build_options(token)),
+    ]).then((data: [sortable, Position[], Folder[]]) => {
+      return <List[]> order_items(data[0], data[1][0])
+    })
   },
   fetch_list: (lid:string, token:string) => {
     return request.get(`${lists_url()}/${lid}`, build_options(token))
-  },
-  fetch_user: (token:string) => {
-    return request.get(user_url(), build_options(token))
   },
   fetch_task_with_info: (tid:string, token:string) => {
     return Promise.all([
@@ -168,7 +161,12 @@ export = {
       request.get(subtasks_url('task', tid), build_options(token)),
       request.get(notes_url('task', tid), build_options(token)),
       request.get(task_positions_url('subtask', 'task', tid), build_options(token))
-    ]).then(process_task)
+    ]).then((data: [Task, Subtask[], Note[], Position[]]) => {
+      return process_task(data[0], data[1], data[2][0], data[3][0], false)
+    })
+  },
+  fetch_user: (token: string) => {
+    return request.get(user_url(), build_options(token))
   },
   auth: (code) => {
     let opts = {

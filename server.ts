@@ -155,7 +155,10 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
 app.get('/user/:wid/lists/:lid/task/:tid', (req, res) => {
   User.findOne({ wid: req.params.wid }).then((user: User) => {
     if (user.public_lists[req.params.lid] === true) {
-      return Promise.all([user, wunderlist.fetch_list(req.params.lid, user.access_token)])
+      return Promise.all([
+        user,
+        wunderlist.fetch_list(req.params.lid, user.access_token)
+      ])
     } else {
       res.status(404).send('list not found or not public')
     }
@@ -221,12 +224,11 @@ app.get('/api/tasks', (req, res) => {
     } else {
       return Promise.reject({ code: 404 })
     }
-  }).then((results: [List, Task[]]) => {
+  }).then((results: {
+    list: List, tasks: Task[]
+  }) => {
     // console.log('second promise')
-    res.json({
-      list: results[0],
-      tasks: results[1]
-    })
+    res.json(results)
   }).catch((err) => {
     if (err.code === 404) {
       res.status(404).send('list not found or not public')
