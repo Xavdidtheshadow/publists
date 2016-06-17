@@ -8,7 +8,7 @@ const url_regex = /https?:\/\/[\w\.\/\&\?@=#-\d]*/
 const url_replacement = '[link removed]'
 type fetch_by = 'task' | 'list'
 type fetch_level = 'task' | 'subtask'
-type sortable = List[] | Task[] | Subtask[]
+type sortable = List | Task | Subtask
 
 // makes sure the auth is there
 const options = {
@@ -67,36 +67,37 @@ function build_options (access_token:string) {
 }
 
 // order a set of items based on their position in the position array
-function order_items(items: sortable, order: Position) {
-  let res: sortable = []
+function order_items(items: sortable[], order: Position) {
+  let res: sortable[] = []
 
   if (!items) {
     // console.log(`order items called with no items!`, items)
     return res
   }
 
-  let indexed_items:{[s:string]: sortable} = _.groupBy(items, 'id')
+  let indexed_items:{[s:string]: sortable} = _.keyBy(items, 'id')
   order.values.forEach((val) => {
     // subtask might not exist
     if (indexed_items[val]) {
-      res.push(indexed_items[val][0])
+      res.push(indexed_items[val])
       // so that we know which ones are left
       delete indexed_items[val]
     }
   })
   // add any remaining tasks; there probably aren't any
-  res = res.concat(<sortable> _.sortBy(_.flatten(_.values(indexed_items)), 'created_at'))
+  res = res.concat(<sortable[]> _.sortBy(_.values(indexed_items), 'id'))
   return res
 }
 
 // pretend we can get back all tasks (completed and not) with one call
 function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[], Position[]]) {
-    let sorted = _.sortBy(data[1].concat(data[2]), 'created_at')
-    return [data[0], sorted, data[3], data[4], data[5]]
+    let combined = data[1].concat(data[2])
+    return [data[0], combined, data[3], data[4], data[5]]
 }
 
 function process_task(task: Task, subtasks: Subtask[], note: Note, position: Position, simple: boolean) {
   // there might be a way to combine these blocks, but i'm not thinking of it
+  // console.log(subtasks)
   if (note) {
     if (simple) {
       task.note = note.content.replace(url_regex, url_replacement)
@@ -129,12 +130,11 @@ export = {
     .then((data: [List, Task[], Subtask[], Note[], Position[]]) => {
       // adds ordered subtasks and notes to tasks
       let subtasks = _.groupBy(data[2], 'task_id')
-      let notes = _.groupBy(data[3], 'task_id')
+      let notes = _.keyBy(data[3], 'task_id')
       let fake_position = <Position> { values: [] }
 
       data[1].forEach((task) => {
-        let note = notes[task.id] ? notes[task.id][0] : undefined
-        task = process_task(task, subtasks[task.id], note, fake_position, true)
+        task = process_task(task, subtasks[task.id], notes[task.id], fake_position, true)
       })
 
       return {
@@ -148,7 +148,7 @@ export = {
       request.get(lists_url(), build_options(token)),
       request.get(list_positions_url(), build_options(token)),
       request.get(folders_url(), build_options(token)),
-    ]).then((data: [sortable, Position[], Folder[]]) => {
+    ]).then((data: [sortable[], Position[], Folder[]]) => {
       return <List[]> order_items(data[0], data[1][0])
     })
   },

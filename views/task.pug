@@ -2,6 +2,8 @@ extends ./layout.pug
 
 block content
   .ng-cloak(ng-controller='TaskController')
+    pre.
+      {{ model | json }}
     h2
       small
         a(href=`/user/${user.wid}/lists`)

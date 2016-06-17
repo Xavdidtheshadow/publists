@@ -114,7 +114,7 @@ app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', functi
 app.controller('TaskController', ['$scope', '$http', 'subtaskFunctions', function($scope, $http, subtaskFunctions) {
   $scope.init = function(): void {
     $scope.loading = true
-    $scope.model = { tasks: [] }
+    $scope.model = { task: {} }
 
     var urlParts = location.href.split('/')
     $scope.model.wid = urlParts[4]
