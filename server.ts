@@ -178,9 +178,10 @@ app.get('/api/lists', (req, res) => {
   if (!req.session.user) {
     res.status(401).send('Unauthenticated')
   } else {
-    wunderlist.fetch_lists(req.session.user.access_token).then((lists) => {
+    wunderlist.fetch_lists(req.session.user.access_token).then((list_info) => {
       res.json({
-        lists: lists,
+        lists: list_info.lists,
+        nested_lids: list_info.nested_lids,
         public_lists: req.session.user.public_lists
       })
     }).catch((err) => {
@@ -196,8 +197,8 @@ app.get('/api/public_lists', (req, res) => {
     // console.log(user)
     // only need the promise array because i'm houisting the variable
     return Promise.all([user, wunderlist.fetch_lists(user.access_token)])
-  }).then((results: [User, List[]]) => {
-    let public_lists = results[1].filter((list) => {
+  }).then((results) => {
+    let public_lists = results[1].lists.filter((list) => {
       return results[0].public_lists[list.id]
     })
 

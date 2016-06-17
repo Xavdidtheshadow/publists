@@ -89,6 +89,22 @@ function order_items(items: sortable[], order: Position) {
   return res
 }
 
+// lists are sorted
+function insert_folders(lists: (List|Folder)[], folders: Folder[]) {
+  folders.forEach((folder) => {
+    // have to do this in the block because multiple folders will change array indexes
+    let ordered_ids = _.map(lists, 'id')
+
+    let folder_start_position = _.min(_.map(folder.list_ids, (lid) => {
+      return ordered_ids.indexOf(lid)
+    }))
+
+    lists.splice(folder_start_position, 0, folder)
+  })
+  // lists and folders
+  return lists
+}
+
 // pretend we can get back all tasks (completed and not) with one call
 function combine_tasks (data: [List, Task[], Task[], Subtask[], Note[], Position[]]) {
     let combined = data[1].concat(data[2])
@@ -148,8 +164,12 @@ export = {
       request.get(lists_url(), build_options(token)),
       request.get(list_positions_url(), build_options(token)),
       request.get(folders_url(), build_options(token)),
-    ]).then((data: [sortable[], Position[], Folder[]]) => {
-      return <List[]> order_items(data[0], data[1][0])
+    ]).then((data: [List[], Position[], Folder[]]) => {
+      let sorted_lists = <List[]> order_items(data[0], data[1][0])
+      return {
+        lists: insert_folders(sorted_lists, data[2]),
+        nested_lids: <number[]> _.flatMap(data[2], 'list_ids')
+      }
     })
   },
   fetch_list: (lid:string, token:string) => {

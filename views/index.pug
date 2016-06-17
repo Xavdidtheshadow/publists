@@ -19,8 +19,9 @@ block content
           {{ model | json }}
       .box
         ul
-          li.clickable.fat(ng-repeat='list in model.lists' ng-click='toggle(list)')
-            input(type='checkbox' ng-model='model.public_lists[list.id]')
+          li.fat(ng-repeat='list in model.lists' ng-click='toggle(list)' ng-class='classes(list)')
+            input(ng-if='list.type !== "folder"' type='checkbox' ng-model='model.public_lists[list.id]')
+            span.glyphicon.glyphicon-folder-open(ng-if='list.type === "folder"')
             | {{ list.title }}
 
           //- should this page link to the list at all?

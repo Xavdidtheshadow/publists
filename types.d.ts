@@ -16,7 +16,8 @@ interface Task {
 interface List {
   id: number,
   created_at: string, // this is a datetime string, really
-  title: string
+  title: string,
+  type: string
 }
 
 interface Position {
@@ -49,5 +50,6 @@ interface User {
 interface Folder {
   id: number,
   title: string,
-  list_ids: number[]
+  list_ids: number[],
+  type: string
 }

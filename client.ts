@@ -26,16 +26,30 @@ app.controller('SettingsController', ['$scope', '$http', '$timeout', function($s
     $scope.loading = true
     $http.get('/api/lists').then(function(res: { data: {
       lists: List[],
-      public_lists: {[s:string]: boolean}
+      public_lists: {[s:string]: boolean},
+      nested_lids: number[]
     }}) {
       $scope.loading = false
       $scope.model.lists = res.data.lists
       $scope.model.public_lists = res.data.public_lists || {}
+      $scope.model.nested_lids = res.data.nested_lids
     })
   }
 
   $scope.toggle = function (list:List) {
     $scope.model.public_lists[list.id] = !$scope.model.public_lists[list.id]
+  }
+
+  $scope.classes = function(item:List|Folder) {
+    var classes:string[] = []
+
+    if (item.type === 'list') {
+      classes.push('clickable')
+      if ($scope.model.nested_lids.indexOf(item.id) > -1) {
+        classes.push('subtask')
+      }
+    }
+    return classes
   }
 
   $scope.save = function () {
