@@ -87,10 +87,8 @@ body {
         }
       }
 
-      p {
-        span {
-          padding-left: 25px;
-        }
+      p.subtask {
+        padding-left: 25px;
       }
     }
 
@@ -116,7 +114,7 @@ body {
         }
 
         .glyphicon {
-          margin-right: 5px;
+          margin-right: 8px;
         }
 
         .progress {

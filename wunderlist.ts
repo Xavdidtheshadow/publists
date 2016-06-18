@@ -168,7 +168,7 @@ export = {
       let sorted_lists = <List[]> order_items(data[0], data[1][0])
       return {
         lists: insert_folders(sorted_lists, data[2]),
-        nested_lids: <number[]> _.flatMap(data[2], 'list_ids')
+        folders: _.keyBy(data[2], 'id')
       }
     })
   },

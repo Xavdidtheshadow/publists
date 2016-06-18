@@ -14,15 +14,17 @@ block content
         span(ng-show='loading').
           Loading...
         span(ng-hide='loading').
-          Check the lists you'd like to make public. You can unpublish at any time by unchecking the box.
+          Check the lists you'd like to make public. Click a folder to toggle all of its contents. You can unpublish at any time by unchecking the box.
         //- pre
           {{ model | json }}
       .box
         ul
-          li.fat(ng-repeat='list in model.lists' ng-click='toggle(list)' ng-class='classes(list)')
-            input(ng-if='list.type !== "folder"' type='checkbox' ng-model='model.public_lists[list.id]')
-            span.glyphicon.glyphicon-folder-open(ng-if='list.type === "folder"')
-            | {{ list.title }}
+          li.fat.clickable(ng-repeat='item in model.lists' ng-click='toggle(item)' ng-class='computeClasses(item)')
+            input(ng-if='item.type !== "folder"' type='checkbox' ng-model='model.public_lists[item.id]')
+            span.glyphicon.glyphicon-list(ng-if='item.type !== "folder"')
+
+            span.glyphicon.glyphicon-folder-open(ng-if='item.type === "folder"')
+            | {{ item.title }}
 
           //- should this page link to the list at all?
           //- a(ng-href=`/user/${wid}/lists/{{list.id}}` target='_blank')

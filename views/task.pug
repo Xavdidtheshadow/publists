@@ -23,11 +23,12 @@ block content
         span.glyphicon.glyphicon-star(ng-if='model.task.starred')
         span.glyphicon.glyphicon-star-empty(ng-if='!model.task.starred')
 
-      p(ng-show='model.task.note')
+      .note(ng-show='model.task.note')
+      p
         strong.
           Note:
-        br
-        span.subtask(ng-bind-html='model.task.note | linky')
+      p.subtask
+        span(ng-bind-html='model.task.note | linky')
 
       .subtasks(ng-if='model.task.subtasks.length > 0')
         p

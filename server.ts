@@ -181,8 +181,8 @@ app.get('/api/lists', (req, res) => {
     wunderlist.fetch_lists(req.session.user.access_token).then((list_info) => {
       res.json({
         lists: list_info.lists,
-        nested_lids: list_info.nested_lids,
-        public_lists: req.session.user.public_lists
+        public_lists: req.session.user.public_lists,
+        folders: list_info.folders
       })
     }).catch((err) => {
       console.log(err.message)

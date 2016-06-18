@@ -1,6 +1,7 @@
 'use strict'
 
 import angular = require('angular')
+import _ = require('lodash')
 // this gets executed and put in global space
 require('angular-ui-indeterminate')
 
@@ -27,24 +28,37 @@ app.controller('SettingsController', ['$scope', '$http', '$timeout', function($s
     $http.get('/api/lists').then(function(res: { data: {
       lists: List[],
       public_lists: {[s:string]: boolean},
-      nested_lids: number[]
+      folders: Folder[]
     }}) {
       $scope.loading = false
       $scope.model.lists = res.data.lists
       $scope.model.public_lists = res.data.public_lists || {}
-      $scope.model.nested_lids = res.data.nested_lids
+      $scope.model.nested_lids = <number[]> _.flatMap(res.data.folders, 'list_ids')
     })
   }
 
-  $scope.toggle = function (list:List) {
-    $scope.model.public_lists[list.id] = !$scope.model.public_lists[list.id]
+  $scope.toggle = function (item: List | Folder) {
+    // cant use typeof becuase they come back from angular as objects
+    if (item.type === 'list') {
+      $scope.flip(item.id)
+    } else {
+      let folder = <Folder> item
+      folder.list_ids.forEach((lid) => {
+        $scope.flip(lid)
+      })
+    }
   }
 
-  $scope.classes = function(item:List|Folder) {
+  $scope.flip = function (id:string) {
+    $scope.model.public_lists[id] = !$scope.model.public_lists[id]
+  }
+
+  $scope.computeClasses = function(item: List | Folder) {
     var classes:string[] = []
 
     if (item.type === 'list') {
-      classes.push('clickable')
+      // can click everything
+      // classes.push('clickable')
       if ($scope.model.nested_lids.indexOf(item.id) > -1) {
         classes.push('subtask')
       }
