@@ -1,10 +1,9 @@
 # publists
+[![David](https://img.shields.io/david/xavdid/publists.svg?maxAge=2592000)](https://david-dm.org/xavdid/publists)
 
 Public lists for Wunderlists.
 
 ## Background
-
-[![David](https://img.shields.io/david/xavdid/publists.svg?maxAge=2592000)](https://david-dm.org/xavdid/publists)
 
 [Once upon a time](https://www.wunderlist.com/blog/a-guide-to-public-lists/) Wunderlist offered public lists. Later that month, they [unreleased](https://support.wunderlist.com/customer/portal/questions/16325899-publishing-a-list) it. Here's our shot and bringing the feature back.
 

@@ -261,10 +261,13 @@ app.get('/api/task_info', (req, res) => {
       return Promise.reject({ code: 404 })
     }
   }).then((result: Task) => {
-    // console.log('second promise')
-    res.json({
-      task: result
-    })
+    if (result.list_id != req.query.lid) {
+      return Promise.reject({ code: 404 })
+    } else {
+      res.json({
+        task: result
+      })
+    }
   }).catch((err) => {
     if (err.code === 404) {
       res.status(404).send(error_text)
