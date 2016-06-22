@@ -20,10 +20,12 @@ function check_if_list_public (wid, lid):Promise<boolean> {
   })
 }
 
+const error_text = 'list not found or not public'
+
 // ROUTES
 app.get('/', (req, res) => {
   res.render('index', {
-    title: title_maker('Index'),
+    title: req.session.user ? title_maker('Settings') : undefined,
     name: req.session.user ? req.session.user.name : null
   })
 })
@@ -125,12 +127,17 @@ app.post('/update', (req, res) => {
 // it looks nicer, it's fine
 app.get('/user/:wid/lists', (req, res) => {
   User.findOne({wid: req.params.wid}).then((user: User) => {
-    res.render('lists', {
-      name: user.name
-    })
+    if (!user) {
+      res.status(404).send(error_text)
+    } else {
+      res.render('lists', {
+        name: user.name,
+        title: title_maker('Public Lists')
+      })
+    }
   }).catch((err) => {
     if (err.statusCode === 404) {
-      res.status(404).send('list not found or not public')
+      res.status(404).send(error_text)
     } else {
       res.status(500).send({error: err.toString()})
     }
@@ -139,12 +146,14 @@ app.get('/user/:wid/lists', (req, res) => {
 
 app.get('/user/:wid/lists/:lid', (req, res) => {
   User.findOne({wid: req.params.wid}).then((user: User) => {
-    if (user.public_lists[req.params.lid] === true) {
+    if (user && user.public_lists[req.params.lid] === true) {
       res.render('list', {
-        user: user
+        user: user,
+        // don't have list name, can't do actual name >.<
+        title: title_maker(`${req.params.lid}`)
       })
     } else {
-      res.status(404).send('list not found or not public')
+      res.status(404).send(error_text)
     }
   }).catch((err) => {
     console.log(err)
@@ -154,22 +163,26 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
 
 app.get('/user/:wid/lists/:lid/task/:tid', (req, res) => {
   User.findOne({ wid: req.params.wid }).then((user: User) => {
-    if (user.public_lists[req.params.lid] === true) {
+    if (user && user.public_lists[req.params.lid] === true) {
       return Promise.all([
         user,
         wunderlist.fetch_list(req.params.lid, user.access_token)
       ])
     } else {
-      res.status(404).send('list not found or not public')
+      return Promise.reject({code: 404})
     }
   }).then((results: [User, List]) => {
     res.render('task', {
       user: results[0],
-      list: results[1]
+      list: results[1],
+      title: title_maker(`${results[1].title} - Task`)
     })
   }).catch((err) => {
-    console.log(err)
-    res.status(500).send({ error: err.toString() })
+    if (err.code === 404) {
+      res.status(404).send(error_text)
+    } else {
+      res.status(500).send({ error: err.toString() })
+    }
   })
 })
 
@@ -210,7 +223,7 @@ app.get('/api/public_lists', (req, res) => {
     })
   }).catch((err) => {
     if (err.statusCode === 404) {
-      res.status(404).send('list not found or not public')
+      res.status(404).send(error_text)
     } else {
       res.status(500).send({ error: err.toString() })
     }
@@ -228,11 +241,10 @@ app.get('/api/tasks', (req, res) => {
   }).then((results: {
     list: List, tasks: Task[]
   }) => {
-    // console.log('second promise')
     res.json(results)
   }).catch((err) => {
     if (err.code === 404) {
-      res.status(404).send('list not found or not public')
+      res.status(404).send(error_text)
     } else {
       console.log(err)
       res.status(500).send({ error: err.toString() })
@@ -255,7 +267,7 @@ app.get('/api/task_info', (req, res) => {
     })
   }).catch((err) => {
     if (err.code === 404) {
-      res.status(404).send('list not found or not public')
+      res.status(404).send(error_text)
     } else {
       console.log(err)
       res.status(500).send({ error: err.toString() })

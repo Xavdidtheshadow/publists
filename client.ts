@@ -158,6 +158,10 @@ app.controller('TaskController', ['$scope', '$http', 'subtaskFunctions', functio
     }) {
       $scope.loading = false
       $scope.model.task = res.data.task
+    }).catch(function(err) {
+      // console.log(err)
+      $scope.loading = false
+      $scope.model.task = {title: 'Not Found'}
     })
   }
 
