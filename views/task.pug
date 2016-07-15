@@ -33,7 +33,7 @@ block content
       .subtasks(ng-if='model.task.subtasks.length > 0')
         p
           strong.
-            Subtasks:
+            Subtasks ({{ subtaskPercentage(model.task.subtasks) }}% complete):
         ul
           li.subtask(ng-repeat='task in model.task.subtasks')
             span.glyphicon.glyphicon-check(ng-if='task.completed')

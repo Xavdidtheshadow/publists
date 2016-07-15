@@ -1,6 +1,6 @@
 {
   "name": "publists",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Public lists for wunderlists.",
   "main": "server.js",
   "scripts": {

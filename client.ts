@@ -12,11 +12,18 @@ var app = angular.module('publists', [
  ])
 
 app.service('subtaskFunctions', function() {
+  function round(num: number) {
+    return Math.round(num * 100) / 100
+  }
+
   return {
     subtaskPercentage: function(subtasks: Subtask[]):number {
-      return subtasks.filter(function(val) {
+      var numComplete = subtasks.filter(function(val) {
         return val.completed === true
-      }).length / subtasks.length * 100
+      }).length
+      console.log('completed ' + numComplete + ' out of ' + subtasks.length)
+      var res = numComplete / subtasks.length * 100
+      return round(res)
     }
   }
 })
