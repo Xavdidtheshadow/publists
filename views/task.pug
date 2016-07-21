@@ -7,8 +7,9 @@ block content
         a(href=`/user/${user.wid}/lists`)
           = user.name
         |  &gt;
+        = ' '
         a(href=`/user/${user.wid}/lists/${list.id}`)
-          = ' ' + list.title
+          = list.title
         |  &gt;
       | Task
 
