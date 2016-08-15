@@ -31,11 +31,17 @@ block content
         p.subtask
           span(ng-bind-html='model.task.note | linky')
 
-      .subtasks(ng-if='model.task.subtasks.length > 0')
+      .subtasks(ng-if='!loading')
         p
-          strong.
-            Subtasks ({{ subtaskPercentage(model.task.subtasks) }}% complete):
-        ul
+          strong
+            | Subtasks
+            = ' '
+            span(ng-if='model.task.subtasks.length > 0').
+              ({{ subtaskPercentage(model.task.subtasks) }}% complete):
+            span(ng-if='!model.task.subtasks.length > 0').
+              (None)
+
+        ul(ng-if='model.task.subtasks.length > 0')
           li.subtask(ng-repeat='task in model.task.subtasks')
             span.glyphicon.glyphicon-check(ng-if='task.completed')
             span.glyphicon.glyphicon-unchecked(ng-if='!task.completed')

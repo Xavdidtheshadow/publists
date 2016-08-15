@@ -7,7 +7,6 @@ require('./config/session')(app)
 const User = require('mongoose').model('User')
 
 import wunderlist = require('./wunderlist')
-// const request = require('request-promise')
 import urlLib = require('url')
 
 function title_maker (s:string) {
@@ -39,14 +38,13 @@ app.get('/faq', (req, res) => {
 app.get('/login', (req, res) => {
   if (app.get('production')) {
     // this is the only thing that works for wunderlist, so no reason to make it any sort of variable
-    let cb_url = 'https://publists.herokuapp.com/callback'
+    const cb_url = 'https://publists.herokuapp.com/callback'
 
-    let url = urlLib.format({
+    const url = urlLib.format({
         protocol: 'https',
         host: 'www.wunderlist.com/oauth/authorize',
         query: {
             client_id: process.env.WUNDERLIST_CLIENT_ID,
-            // redirect_uri: 'https://publists.herokuapp.com',
             redirect_uri: cb_url,
             state: process.env.STATE
         }
@@ -59,11 +57,8 @@ app.get('/login', (req, res) => {
 
 app.get('/callback', (req, res) => {
   let code: string = req.query.code
-  // console.log(code)
   if (req.query.state === process.env.STATE) {
-    // console.log('in callback inner!')
     wunderlist.getAuthedUser(code).then((results) => {
-      // console.log('posted for access', results)
       return User.login(results[0].access_token, results[1].id, results[1].name)
     }).then((user: User) => {
       req.session.user = user
@@ -111,9 +106,7 @@ app.post('/update', (req, res) => {
       new: true,
       runValidators: true
     }).then((u) => {
-      // console.log('postsave', u)
       req.session.user = u
-      // console.log('saved!', req.session.user.public_lists)
       res.sendStatus(200)
     }).catch((err) => {
       console.log('err', err)
@@ -132,7 +125,7 @@ app.get('/user/:wid/lists', (req, res) => {
     } else {
       res.render('lists', {
         name: user.name,
-        title: title_maker('Public Lists')
+        title: title_maker(`${user.name}'s Public Lists`)
       })
     }
   }).catch((err) => {
@@ -150,7 +143,8 @@ app.get('/user/:wid/lists/:lid', (req, res) => {
       res.render('list', {
         user: user,
         // don't have list name, can't do actual name >.<
-        title: title_maker(`${req.params.lid}`)
+        // fetching all the tasks is best done asynchronously
+        title: title_maker(`${user.name}'s List - ${req.params.lid}`)
       })
     } else {
       res.status(404).send(error_text)
@@ -216,10 +210,8 @@ app.get('/api/public_lists', (req, res) => {
     })
 
     res.json({
-      // wid: req.params.wid,
       lists: public_lists,
       name: results[0].name
-      // title: title_maker(`${results[0].name}'s lists`)
     })
   }).catch((err) => {
     if (err.statusCode === 404) {
