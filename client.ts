@@ -2,6 +2,7 @@
 
 import angular = require('angular')
 import _ = require('lodash')
+
 // this gets executed and put in global space
 require('angular-ui-indeterminate')
 
@@ -28,7 +29,7 @@ app.service('subtaskFunctions', function() {
   }
 })
 
-app.controller('SettingsController', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
+app.controller('SettingsController', ['$scope', '$http', '$timeout', function($scope, $http: ng.IHttpService, $timeout) {
   $scope.init = function () {
     $scope.model = {}
     $scope.loading = true
@@ -91,15 +92,25 @@ app.controller('SettingsController', ['$scope', '$http', '$timeout', function($s
   $scope.init()
 }])
 
-app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
+interface ListsScope extends ng.IScope {
+  // init: function()
+  model: {
+    lists: List[],
+    wid: string,
+  },
+  loading: boolean,
+  init(): void
+}
+
+app.controller('ListsController', ['$scope', '$http', function($scope: ListsScope, $http) {
   $scope.init = function() {
     $scope.loading = true
-    $scope.model = {
-      lists: []
-    }
-
     var urlParts = location.href.split('/')
-    $scope.model.wid = urlParts[4]
+
+    $scope.model = {
+      lists: [],
+      wid: urlParts[4]
+    }
 
     $http.get('/api/public_lists', {
       params: { wid: $scope.model.wid }
@@ -118,7 +129,7 @@ app.controller('ListsController', ['$scope', '$http', function($scope, $http) {
   $scope.init()
 }])
 
-app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', function($scope, $http, subtaskFunctions) {
+app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', function($scope, $http: ng.IHttpService, subtaskFunctions) {
   $scope.init = function():void {
     $scope.loading = true
     $scope.model = { tasks: [] }
