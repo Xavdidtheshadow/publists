@@ -11,6 +11,8 @@ block content
     p
       span(ng-show='loading').
         Loading...
+      span(ng-show='model.message').
+        {{model.message}}
 
     .box(ng-if='model.lists.length > 0')
       p
@@ -24,5 +26,5 @@ block content
             span.
               {{ list.title }}
 
-    p(ng-if='!loading && model.lists.length === 0').
+    p(ng-if='!loading && model.lists.length === 0 && !model.message').
       This user has no public lists

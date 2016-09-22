@@ -10,8 +10,10 @@ block content
       span(ng-bind='loading ? " Loading..." : " " + model.list.title' )
 
     p
-      span(ng-hide='loading').
+      span(ng-hide='loading || model.message').
         This is the current state of the list. Click a task for more info.
+      span(ng-show='model.message').
+        {{model.message}}
 
     .box(ng-if='model.tasks.length > 0')
       ul

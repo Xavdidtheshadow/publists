@@ -97,6 +97,7 @@ interface ListsScope extends ng.IScope {
   model: {
     lists: List[],
     wid: string,
+    message?: string
   },
   loading: boolean,
   init(): void
@@ -123,6 +124,10 @@ app.controller('ListsController', ['$scope', '$http', function($scope: ListsScop
       $scope.model.lists = res.data.lists
       // $scope.model.statics.name = res.data.name
       $scope.loading = false
+    }).catch((err) => {
+      $scope.loading = false
+      $scope.model.lists = []
+      $scope.model.message = "Error! Looks like there's an issue with Wunderlist."
     })
   }
 
@@ -150,6 +155,10 @@ app.controller('TasksController', ['$scope', '$http', 'subtaskFunctions', functi
       $scope.model.tasks = res.data.tasks || []
       // console.log(res.data.list)
       $scope.model.list = res.data.list
+    }).catch((err) => {
+      $scope.loading = false
+      $scope.model.tasks = []
+      $scope.model.message = "Error! Looks like there's an issue with Wunderlist."
     })
   }
 
