@@ -1,7 +1,12 @@
 # publists
+
 [![David](https://img.shields.io/david/xavdid/publists.svg?maxAge=2592000)](https://david-dm.org/xavdid/publists)
 
 Public lists for Wunderlists.
+
+## Deprecation
+
+As Wunderlist will (eventually) [shut off](https://techcrunch.com/2017/04/19/microsoft-to-shut-down-wunderlist-in-favor-of-its-new-app-to-do/), so too will this. It'll stay up for now, but will eventually just be memories.
 
 ## Background
 
